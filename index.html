@@ -1,0 +1,2511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mi Hogar">
+<meta name="theme-color" content="#0d0d1a">
+<title>Mi Hogar — Gestión Familiar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #080810;
+  --bg-dark: #0d0d1a;
+  --bg-card: #12121f;
+  --bg-card2: #16162a;
+  --lila: #a78bfa;
+  --lila-dark: #7c3aed;
+  --lila-mid: #8b5cf6;
+  --lila-soft: rgba(167,139,250,0.15);
+  --lila-glow: rgba(167,139,250,0.3);
+  --celeste: #67e8f9;
+  --celeste-dark: #0891b2;
+  --celeste-soft: rgba(103,232,249,0.12);
+  --celeste-glow: rgba(103,232,249,0.25);
+  --text-primary: #f0f0ff;
+  --text-secondary: #9999bb;
+  --text-muted: #55556a;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --border: rgba(167,139,250,0.12);
+  --border-hover: rgba(167,139,250,0.3);
+  --radius: 18px;
+  --radius-sm: 10px;
+  --font: 'Outfit', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  --safe-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Ambient background */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; left: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+  animation: floatBg 8s ease-in-out infinite;
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -150px; right: -100px;
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(8,145,178,0.15) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+  animation: floatBg 10s ease-in-out infinite reverse;
+}
+
+@keyframes floatBg {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(20px,-20px) scale(1.05); }
+}
+
+/* APP CONTAINER */
+#app {
+  position: relative;
+  z-index: 1;
+  padding-bottom: calc(80px + var(--safe-bottom));
+}
+
+/* HEADER */
+.app-header {
+  padding: 60px 20px 20px;
+  background: linear-gradient(180deg, rgba(8,8,16,0.95) 0%, transparent 100%);
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.header-top { display: flex; justify-content: space-between; align-items: center; }
+.app-logo {
+  font-size: 22px; font-weight: 800;
+  background: linear-gradient(135deg, var(--lila) 0%, var(--celeste) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+.header-date {
+  font-size: 12px; color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 430px;
+  padding: 12px 20px calc(12px + var(--safe-bottom));
+  background: rgba(13,13,26,0.92);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: center;
+  z-index: 200;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 16px; border-radius: 14px;
+  cursor: pointer; transition: all 0.25s;
+  border: none; background: transparent;
+  color: var(--text-muted); font-family: var(--font);
+}
+.nav-item.active {
+  color: var(--lila);
+  background: var(--lila-soft);
+}
+.nav-item svg { width: 22px; height: 22px; }
+.nav-item span { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
+
+/* SCREENS */
+.screen { display: none; animation: fadeIn 0.3s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* SECTION HEADER */
+.section-header {
+  padding: 16px 20px 8px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.section-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* CARDS */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin: 0 16px 12px;
+  transition: border-color 0.2s;
+  position: relative; overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,0.4), transparent);
+}
+.card-accent { border-left: 3px solid var(--lila); }
+.card-celeste { border-left: 3px solid var(--celeste); }
+
+/* STAT CARDS GRID */
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; padding: 0 16px; margin-bottom: 12px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: relative; overflow: hidden;
+  transition: all 0.2s;
+}
+.stat-card::after {
+  content: '';
+  position: absolute; bottom: -20px; right: -20px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glow-color, rgba(167,139,250,0.1)), transparent);
+}
+.stat-card.lila { --glow-color: rgba(167,139,250,0.12); }
+.stat-card.celeste { --glow-color: rgba(103,232,249,0.1); }
+.stat-card.success { --glow-color: rgba(74,222,128,0.1); }
+.stat-card.warning { --glow-color: rgba(251,191,36,0.1); }
+.stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.stat-value { font-size: 22px; font-weight: 800; font-family: var(--font-mono); letter-spacing: -1px; }
+.stat-value.lila { color: var(--lila); }
+.stat-value.celeste { color: var(--celeste); }
+.stat-value.success { color: var(--success); }
+.stat-value.warning { color: var(--warning); }
+.stat-value.danger { color: var(--danger); }
+.stat-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+/* PROGRESS BAR */
+.progress-bar {
+  height: 5px; background: rgba(255,255,255,0.06);
+  border-radius: 99px; overflow: hidden; margin-top: 10px;
+}
+.progress-fill {
+  height: 100%; border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+.fill-success { background: linear-gradient(90deg, var(--success), #86efac); }
+.fill-warning { background: linear-gradient(90deg, var(--warning), #fde68a); }
+.fill-danger { background: linear-gradient(90deg, var(--danger), #fca5a5); }
+.fill-lila { background: linear-gradient(90deg, var(--lila-dark), var(--lila)); }
+
+/* INCOME ITEM */
+.income-item {
+  display: flex; align-items: center; gap: 12px; padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.income-item:last-child { border-bottom: none; padding-bottom: 0; }
+.income-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--lila-soft); flex-shrink: 0; font-size: 18px;
+}
+.income-icon.celeste-bg { background: var(--celeste-soft); }
+.income-info { flex: 1; }
+.income-name { font-size: 14px; font-weight: 600; }
+.income-freq { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.income-amount { font-family: var(--font-mono); font-weight: 700; color: var(--success); font-size: 15px; }
+.income-next { font-size: 10px; color: var(--text-muted); text-align: right; }
+
+/* PRODUCT ITEM */
+.product-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.product-item:last-child { border-bottom: none; padding-bottom: 0; }
+.product-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.product-name { font-size: 14px; font-weight: 600; }
+.product-cat { font-size: 10px; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 99px; margin-top: 3px; display: inline-block; }
+.product-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 99px;
+  font-family: var(--font-mono);
+}
+.badge-ok { background: rgba(74,222,128,0.15); color: var(--success); }
+.badge-warn { background: rgba(251,191,36,0.15); color: var(--warning); }
+.badge-danger { background: rgba(248,113,113,0.15); color: var(--danger); }
+.product-details { display: flex; gap: 16px; font-size: 11px; color: var(--text-muted); }
+.product-qty { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+
+/* ALERT ITEMS */
+.alert-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px; border-radius: 12px; margin-bottom: 8px;
+}
+.alert-item.alert-danger { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.2); }
+.alert-item.alert-warning { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); }
+.alert-item.alert-info { background: var(--lila-soft); border: 1px solid rgba(167,139,250,0.2); }
+.alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.alert-text { flex: 1; font-size: 13px; line-height: 1.5; }
+.alert-title { font-weight: 700; margin-bottom: 2px; }
+
+/* BUTTONS */
+.btn {
+  border: none; cursor: pointer; font-family: var(--font);
+  font-weight: 600; border-radius: 12px; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--lila-dark), var(--lila-mid));
+  color: white; padding: 14px 24px; font-size: 15px; width: 100%;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+}
+.btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+.btn-secondary {
+  background: var(--lila-soft); color: var(--lila);
+  border: 1px solid var(--border-hover);
+  padding: 10px 18px; font-size: 13px;
+}
+.btn-celeste {
+  background: var(--celeste-soft); color: var(--celeste);
+  border: 1px solid rgba(103,232,249,0.2);
+  padding: 10px 18px; font-size: 13px;
+}
+.btn-danger-soft {
+  background: rgba(248,113,113,0.1); color: var(--danger);
+  border: 1px solid rgba(248,113,113,0.2);
+  padding: 8px 14px; font-size: 12px;
+}
+.btn-sm { padding: 8px 14px; font-size: 12px; }
+.btn-row { display: flex; gap: 10px; margin-top: 12px; }
+
+/* FAB */
+.fab {
+  position: fixed; bottom: calc(90px + var(--safe-bottom));
+  right: 20px; z-index: 150;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--lila-dark), var(--lila-mid));
+  box-shadow: 0 4px 24px rgba(124,58,237,0.5);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.fab:active { transform: scale(0.92); }
+
+/* FORMS */
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; display: block; }
+.form-control {
+  width: 100%; background: #1a1a2e;
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; font-family: var(--font); font-size: 15px;
+  color: var(--text-primary); outline: none; transition: border-color 0.2s;
+  color-scheme: dark;
+}
+.form-control:focus { border-color: var(--lila); background: #1e1b36; }
+.form-control::placeholder { color: var(--text-muted); }
+select.form-control {
+  appearance: none; -webkit-appearance: none;
+  background-color: #1a1a2e;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  padding-right: 36px;
+}
+select.form-control option {
+  background-color: #1a1a2e;
+  color: #f0f0ff;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(8,8,16,0.85); backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-sheet {
+  background: var(--bg-card2);
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid var(--border);
+  padding: 8px 20px calc(20px + var(--safe-bottom));
+  width: 100%; max-width: 430px;
+  transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.34,1.3,0.64,1);
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+.modal-handle {
+  width: 40px; height: 4px; background: rgba(255,255,255,0.12);
+  border-radius: 99px; margin: 8px auto 20px;
+}
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 48px 32px;
+  color: var(--text-muted);
+}
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+.empty-text { font-size: 14px; line-height: 1.6; }
+
+/* CHIPS */
+.chip {
+  display: inline-flex; align-items: center;
+  padding: 4px 12px; border-radius: 99px;
+  font-size: 11px; font-weight: 600;
+  background: var(--lila-soft); color: var(--lila);
+}
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+/* HEADER ACTIONS */
+.header-actions { display: flex; gap: 8px; }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-secondary); transition: all 0.2s;
+}
+.icon-btn:active { background: var(--lila-soft); color: var(--lila); }
+
+/* PREDICTION SECTION */
+.predict-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.predict-row:last-child { border-bottom: none; }
+.predict-label { font-size: 13px; color: var(--text-secondary); }
+.predict-value { font-size: 13px; font-weight: 700; font-family: var(--font-mono); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 0; }
+
+/* TOAST */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px);
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 20px;
+  font-size: 13px; font-weight: 600;
+  z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1);
+  display: flex; align-items: center; gap: 8px;
+  backdrop-filter: blur(20px); white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(60px); }
+
+/* PULSE */
+@keyframes pulse {
+  0%,100% { opacity:1; } 50% { opacity:0.5; }
+}
+.pulse { animation: pulse 2s ease-in-out infinite; }
+
+/* TAG */
+.freq-tag {
+  font-size: 10px; padding: 2px 8px; border-radius: 99px;
+  background: var(--celeste-soft); color: var(--celeste); font-weight: 600;
+}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="header-top">
+      <div>
+        <div class="app-logo">🏠 Mi Hogar</div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showExport()" title="Exportar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </button>
+        <button class="icon-btn" onclick="triggerImport()" title="Importar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREENS -->
+
+  <!-- DASHBOARD -->
+  <div id="screen-dashboard" class="screen active">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Resumen</div>
+        <div class="section-sub" id="dash-date"></div>
+      </div>
+    </div>
+
+    <!-- BALANCE DESTACADO -->
+    <div style="padding: 0 16px 12px;">
+      <div class="balance-hero" id="balance-hero">
+        <div class="balance-hero-label">💵 Disponible ahora</div>
+        <div class="balance-hero-amount" id="stat-balance">Q 0.00</div>
+        <div class="balance-hero-sub" id="stat-balance-sub">Sin movimientos registrados</div>
+        <button class="btn-add-extra" onclick="openExtraModal('income')">+ Agregar ingreso</button>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card lila">
+        <div class="stat-label">Ingreso Mensual</div>
+        <div class="stat-value lila" id="stat-ingreso">Q 0.00</div>
+        <div class="stat-hint" id="stat-ingreso-hint">proyección</div>
+      </div>
+      <div class="stat-card celeste">
+        <div class="stat-label">Próximo Ingreso</div>
+        <div class="stat-value celeste" id="stat-proximo">—</div>
+        <div class="stat-hint" id="stat-proximo-hint">—</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-label">Productos OK</div>
+        <div class="stat-value success" id="stat-ok">0</div>
+        <div class="stat-hint">Suficiente stock</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-label">En Alerta</div>
+        <div class="stat-value warning" id="stat-alert">0</div>
+        <div class="stat-hint">Necesitan atención</div>
+      </div>
+    </div>
+
+    <!-- ALERTS -->
+    <div id="alerts-section" style="margin: 0 16px 12px;"></div>
+
+    <!-- PREDICTION -->
+    <div class="card card-celeste" id="prediction-card" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-size:18px;">🔮</span>
+        <div style="font-size:15px;font-weight:700;">Proyección al próximo ingreso</div>
+      </div>
+      <div id="prediction-content"></div>
+    </div>
+
+    <!-- QUICK SUMMARY -->
+    <div class="card" id="quick-products">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:14px;font-weight:700;">📦 Inventario crítico</div>
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('inventario')">Ver todo</button>
+      </div>
+      <div id="critical-list">
+        <div class="empty-state" style="padding:20px;">
+          <div class="empty-icon" style="font-size:28px;">✅</div>
+          <div class="empty-text">Todo en orden</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANZAS -->
+  <div id="screen-finanzas" class="screen">
+    <div class="section-header">
+      <div>
+        <div class="section-title">💰 Finanzas</div>
+        <div class="section-sub">Presupuesto del hogar</div>
+      </div>
+      <button class="icon-btn" onclick="openIncomeSettingsModal()" title="Configurar ingresos" style="width:38px;height:38px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+    </div>
+
+
+    <!-- RESUMEN FINANCIERO -->
+    <div style="padding:0 16px 12px;">
+      <div class="fin-hero">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--celeste);opacity:0.8;margin-bottom:4px;">Ingreso mensual est.</div>
+            <div style="font-size:30px;font-weight:800;font-family:var(--font-mono);letter-spacing:-1.5px;background:linear-gradient(135deg,#fff,var(--celeste));-webkit-background-clip:text;-webkit-text-fill-color:transparent;" id="fin-total">Q 0.00</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">Disponible ahora</div>
+            <div style="font-size:20px;font-weight:800;font-family:var(--font-mono);" id="fin-balance-display">Q 0.00</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="fin-action-btn income" onclick="openExtraModal('income')">📈 Ingreso</button>
+          <button class="fin-action-btn expense" onclick="openExtraModal('expense')">📉 Gasto</button>
+          <button class="fin-action-btn adjust" onclick="openExtraModal('adjust')">⚖️ Ajustar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRESUPUESTO POR CATEGORÍAS -->
+    <div class="section-header" style="padding-top:4px;">
+      <div>
+        <div class="section-title" style="font-size:16px;">📊 Presupuesto</div>
+        <div class="section-sub" id="budget-cycle-sub">Ciclo: del 1 al fin de mes</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" style="background:rgba(103,232,249,0.1);color:var(--celeste);border:1px solid rgba(103,232,249,0.2);font-size:11px;" onclick="openBudgetCycleModal()" title="Configurar ciclo">📅 Ciclo</button>
+        <button class="btn btn-secondary btn-sm" onclick="openBudgetModal()">+ Categoría</button>
+      </div>
+    </div>
+    <div id="budget-list" style="padding:0 16px 4px;"></div>
+
+    <!-- MOVIMIENTOS RECIENTES -->
+    <div class="section-header" style="padding-top:4px;">
+      <div>
+        <div class="section-title" style="font-size:16px;">💸 Movimientos</div>
+        <div class="section-sub" id="fin-txn-sub">Historial de entradas y salidas</div>
+      </div>
+    </div>
+    <div class="card" id="transactions-list">
+      <div class="empty-state" style="padding:24px;">
+        <div class="empty-icon" style="font-size:30px;">💸</div>
+        <div class="empty-text">Sin movimientos aún</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVENTARIO -->
+  <div id="screen-inventario" class="screen">
+    <div class="section-header">
+      <div>
+        <div class="section-title">📦 Inventario</div>
+        <div class="section-sub">Suministros del hogar</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="openInvCatListModal()" title="Gestionar categorías">🏷️</button>
+        <button class="btn btn-secondary btn-sm" onclick="openProductModal()">+ Nuevo</button>
+      </div>
+    </div>
+
+    <!-- FILTER CHIPS -->
+    <div style="display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;">
+      <button class="btn btn-secondary btn-sm filter-chip active" data-filter="all" onclick="filterProducts('all',this)">Todos</button>
+      <button class="btn btn-sm filter-chip" style="background:rgba(248,113,113,0.1);color:var(--danger);border:1px solid rgba(248,113,113,0.2);" data-filter="danger" onclick="filterProducts('danger',this)">🔴 Crítico</button>
+      <button class="btn btn-sm filter-chip" style="background:rgba(251,191,36,0.1);color:var(--warning);border:1px solid rgba(251,191,36,0.2);" data-filter="warning" onclick="filterProducts('warning',this)">🟡 Alerta</button>
+      <button class="btn btn-sm filter-chip" style="background:rgba(74,222,128,0.1);color:var(--success);border:1px solid rgba(74,222,128,0.2);" data-filter="ok" onclick="filterProducts('ok',this)">🟢 OK</button>
+    </div>
+
+    <div class="card" id="products-list">
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <div class="empty-text">Agrega productos<br>para controlar tu inventario</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREDICCION -->
+  <div id="screen-prediccion" class="screen">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🔮 Predicción</div>
+        <div class="section-sub">Análisis y recomendaciones</div>
+      </div>
+    </div>
+
+    <div class="card card-accent">
+      <div style="font-size:13px;font-weight:700;color:var(--lila);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.6px;">📊 Próximo ingreso</div>
+      <div id="pred-income-info">
+        <div style="color:var(--text-muted);font-size:13px;">Registra ingresos para ver proyecciones</div>
+      </div>
+    </div>
+
+    <div class="card" id="pred-products-card">
+      <div style="font-size:13px;font-weight:700;color:var(--celeste);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.6px;">📦 Duración de productos</div>
+      <div id="pred-products-list">
+        <div style="color:var(--text-muted);font-size:13px;">Registra productos con consumo diario</div>
+      </div>
+    </div>
+
+    <div class="card" id="pred-recommendations">
+      <div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.6px;">🛒 Recomendaciones de compra</div>
+      <div id="pred-rec-list">
+        <div style="color:var(--text-muted);font-size:13px;">Agrega productos para ver recomendaciones</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAB GROUP - Dashboard only -->
+<div id="fab-group" style="position:fixed;bottom:calc(90px + var(--safe-bottom));right:20px;z-index:150;display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+  <button class="fab fab-sub fab-expense" onclick="openExtraModal('expense')" title="Registrar gasto" style="width:46px;height:46px;">📉</button>
+  <button class="fab fab-sub fab-income" onclick="openExtraModal('income')" title="Registrar ingreso" style="width:46px;height:46px;">📈</button>
+</div>
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="switchTab('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>Inicio</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('finanzas')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    <span>Finanzas</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('inventario')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+    <span>Inventario</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('prediccion')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <span>Predicción</span>
+  </button>
+</nav>
+
+<!-- INCOME MODAL -->
+<div class="modal-overlay" id="income-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="income-modal-title">Nuevo Ingreso</div>
+    <div class="form-group">
+      <label class="form-label">Nombre / Fuente</label>
+      <input class="form-control" id="inc-name" placeholder="Ej: Salario, Freelance...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Monto (Q)</label>
+      <input class="form-control" id="inc-amount" type="number" placeholder="0.00" step="0.01">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Frecuencia</label>
+      <select class="form-control" id="inc-freq" onchange="onFreqChange()">
+        <option value="weekly">Semanal</option>
+        <option value="semimonthly" selected>Semi-mensual (2 fechas)</option>
+        <option value="monthly">Mensual</option>
+      </select>
+    </div>
+    <!-- Semanal / Mensual: un solo campo -->
+    <div class="form-group" id="inc-lastdate-group">
+      <label class="form-label">Último pago recibido</label>
+      <input class="form-control" id="inc-lastdate" type="date">
+    </div>
+    <!-- Semi-mensual: dos fechas del mes -->
+    <div id="inc-semimonthly-group" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">Día del primer pago del mes</label>
+        <select class="form-control" id="inc-day1">
+          <!-- populated by JS -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Día del segundo pago del mes</label>
+        <select class="form-control" id="inc-day2">
+          <!-- populated by JS -->
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ícono</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="icon-picker active-icon" data-icon="💼" onclick="selectIcon(this)">💼</button>
+        <button class="icon-picker" data-icon="💵" onclick="selectIcon(this)">💵</button>
+        <button class="icon-picker" data-icon="🏦" onclick="selectIcon(this)">🏦</button>
+        <button class="icon-picker" data-icon="💻" onclick="selectIcon(this)">💻</button>
+        <button class="icon-picker" data-icon="🏪" onclick="selectIcon(this)">🏪</button>
+        <button class="icon-picker" data-icon="🎨" onclick="selectIcon(this)">🎨</button>
+        <button class="icon-picker" data-icon="🚗" onclick="selectIcon(this)">🚗</button>
+        <button class="icon-picker" data-icon="💰" onclick="selectIcon(this)">💰</button>
+      </div>
+    </div>
+    <input type="hidden" id="inc-edit-id">
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveIncome()" id="inc-save-btn">Guardar Ingreso</button>
+    </div>
+    <div id="inc-delete-row" style="display:none;margin-top:10px;">
+      <button class="btn btn-danger-soft" style="width:100%;" onclick="deleteIncome()">🗑 Eliminar ingreso</button>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('income-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="product-modal-title">Nuevo Producto</div>
+    <div class="form-group">
+      <label class="form-label">Nombre del producto</label>
+      <input class="form-control" id="prod-name" placeholder="Ej: Arroz, Aceite, Jabón...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Categoría</label>
+      <select class="form-control" id="prod-cat">
+        <!-- populated dynamically -->
+      </select>
+      <div style="margin-top:6px;">
+        <button type="button" style="background:none;border:none;color:var(--lila);font-size:12px;cursor:pointer;padding:0;font-family:var(--font);" onclick="closeModal('product-modal');openInvCatListModal()">+ Crear nueva categoría de inventario</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Cantidad actual</label>
+        <input class="form-control" id="prod-qty" type="number" placeholder="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unidad</label>
+        <select class="form-control" id="prod-unit">
+          <option value="unidades">unidades</option>
+          <option value="kg">kg</option>
+          <option value="g">g</option>
+          <option value="L">L</option>
+          <option value="ml">ml</option>
+          <option value="lbs">lbs</option>
+          <option value="oz">oz</option>
+          <option value="paquetes">paquetes</option>
+          <option value="rollos">rollos</option>
+          <option value="botellas">botellas</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Consumo</label>
+        <input class="form-control" id="prod-daily" type="number" placeholder="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Frecuencia</label>
+        <select class="form-control" id="prod-consume-freq">
+          <option value="daily">Por día</option>
+          <option value="weekly">Por semana</option>
+          <option value="monthly">Por mes</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Mín. en alerta</label>
+        <input class="form-control" id="prod-min" type="number" placeholder="0" step="0.01">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Precio estimado (Q)</label>
+      <input class="form-control" id="prod-price" type="number" placeholder="0.00" step="0.01">
+    </div>
+    <input type="hidden" id="prod-edit-id">
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveProduct()">Guardar Producto</button>
+    </div>
+    <div id="prod-delete-row" style="display:none;margin-top:10px;">
+      <button class="btn btn-danger-soft" style="width:100%;" onclick="deleteProduct()">🗑 Eliminar producto</button>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('product-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📤 Exportar datos</div>
+    <div style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin-bottom:20px;">
+      Descarga una copia de todos tus datos (ingresos e inventario) en formato JSON. Úsala como respaldo o para migrar a otro dispositivo.
+    </div>
+    <button class="btn btn-primary" onclick="exportData()">⬇️ Descargar respaldo JSON</button>
+    <br><br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('export-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📥 Importar datos</div>
+    <div style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin-bottom:20px;">
+      Se validará el archivo antes de importar. Elige si deseas sobrescribir o fusionar con los datos existentes.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Modo de importación</label>
+      <select class="form-control" id="import-mode">
+        <option value="merge">Fusionar (conserva datos actuales)</option>
+        <option value="overwrite">Sobrescribir (reemplaza todo)</option>
+      </select>
+    </div>
+    <div id="import-preview" style="display:none;" class="card" style="margin:0;padding:12px;">
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--celeste);">Vista previa del archivo</div>
+      <div id="import-preview-content"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-celeste" onclick="triggerImportFile()" style="flex:1;">📂 Seleccionar archivo</button>
+      <button class="btn btn-primary" id="import-confirm-btn" style="flex:1;display:none;" onclick="confirmImport()">✅ Importar</button>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('import-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- INCOME SETTINGS MODAL (gear icon) -->
+<div class="modal-overlay" id="income-settings-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div class="modal-title" style="margin:0;">⚙️ Configurar Ingresos</div>
+      <button class="btn btn-secondary btn-sm" onclick="openIncomeModal()">+ Nuevo</button>
+    </div>
+    <div id="income-settings-list">
+      <div class="empty-state" style="padding:24px;">
+        <div class="empty-icon">💳</div>
+        <div class="empty-text">Agrega tus fuentes de ingreso<br>para comenzar</div>
+      </div>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('income-settings-modal')">Cerrar</button>
+  </div>
+</div>
+
+<!-- BUDGET CATEGORY MODAL -->
+<div class="modal-overlay" id="budget-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="budget-modal-title">Nueva Categoría de Presupuesto</div>
+    <div class="form-group">
+      <label class="form-label">Nombre de categoría</label>
+      <input class="form-control" id="bud-name" placeholder="Ej: Alimentación, Servicios, Transporte...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ícono</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="icon-picker active-icon" data-icon="🛒" onclick="selectBudgetIcon(this)">🛒</button>
+        <button class="icon-picker" data-icon="🍽️" onclick="selectBudgetIcon(this)">🍽️</button>
+        <button class="icon-picker" data-icon="💡" onclick="selectBudgetIcon(this)">💡</button>
+        <button class="icon-picker" data-icon="🚗" onclick="selectBudgetIcon(this)">🚗</button>
+        <button class="icon-picker" data-icon="👕" onclick="selectBudgetIcon(this)">👕</button>
+        <button class="icon-picker" data-icon="🏥" onclick="selectBudgetIcon(this)">🏥</button>
+        <button class="icon-picker" data-icon="📚" onclick="selectBudgetIcon(this)">📚</button>
+        <button class="icon-picker" data-icon="🎮" onclick="selectBudgetIcon(this)">🎮</button>
+        <button class="icon-picker" data-icon="💅" onclick="selectBudgetIcon(this)">💅</button>
+        <button class="icon-picker" data-icon="🐾" onclick="selectBudgetIcon(this)">🐾</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Presupuesto mensual (Q)</label>
+      <input class="form-control" id="bud-limit" type="number" placeholder="0.00" step="0.01">
+    </div>
+    <input type="hidden" id="bud-edit-id">
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveBudgetCategory()">Guardar</button>
+    </div>
+    <div id="bud-delete-row" style="display:none;margin-top:10px;">
+      <button class="btn btn-danger-soft" style="width:100%;" onclick="deleteBudgetCategory()">🗑 Eliminar categoría</button>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('budget-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- RESTOCK MODAL -->
+<div class="modal-overlay" id="restock-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="restock-modal-title">📦 Reabastecer producto</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:14px;background:var(--bg-card);border-radius:14px;border:1px solid var(--border);">
+      <div style="font-size:28px;" id="restock-emoji">📦</div>
+      <div>
+        <div style="font-weight:700;font-size:15px;" id="restock-product-name">Producto</div>
+        <div style="font-size:12px;color:var(--text-muted);">Stock actual: <span id="restock-current-qty" style="color:var(--lila);font-weight:700;"></span></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cantidad a agregar</label>
+      <input class="form-control" id="restock-qty" type="number" placeholder="0" step="0.01" min="0.01">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Costo de compra (Q) <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+      <input class="form-control" id="restock-cost" type="number" placeholder="0.00" step="0.01" min="0">
+    </div>
+    <div class="form-group" id="restock-budget-group" style="display:none;">
+      <label class="form-label">Cargar gasto a categoría de presupuesto</label>
+      <select class="form-control" id="restock-budget-id">
+        <option value="">— Sin categoría —</option>
+      </select>
+    </div>
+    <input type="hidden" id="restock-product-id">
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveRestock()">✅ Reabastecer</button>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('restock-modal')">Cancelar</button>
+  </div>
+</div>
+
+<style>
+/* FIN HERO */
+.fin-hero {
+  background: linear-gradient(135deg, #0f2233 0%, #1a0f3a 100%);
+  border: 1px solid rgba(103,232,249,0.2);
+  border-radius: 22px; padding: 20px 18px 16px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(8,145,178,0.15);
+}
+.fin-hero::before {
+  content:''; position:absolute; top:-40px; left:-40px;
+  width:160px; height:160px;
+  background: radial-gradient(circle, rgba(167,139,250,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.fin-hero::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(103,232,249,0.5), rgba(167,139,250,0.5), transparent);
+}
+.fin-action-btn {
+  flex:1; padding:9px 6px; border-radius:10px; font-size:12px; font-weight:700;
+  border:none; cursor:pointer; font-family:var(--font); transition:all 0.2s; text-align:center;
+}
+.fin-action-btn.income { background:rgba(74,222,128,0.15); color:var(--success); }
+.fin-action-btn.expense { background:rgba(248,113,113,0.15); color:var(--danger); }
+.fin-action-btn.adjust { background:rgba(251,191,36,0.15); color:var(--warning); }
+.fin-action-btn:active { transform:scale(0.95); }
+
+/* BUDGET CARD */
+.budget-cat-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.budget-cat-card:active { border-color: var(--lila); }
+.budget-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.budget-icon { font-size:22px; }
+.budget-name { font-size:14px; font-weight:700; flex:1; }
+.budget-amounts { display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-bottom:6px; }
+.budget-spent { font-family:var(--font-mono); font-weight:700; }
+
+/* FAB VARIANTS */
+.fab-main {
+  background: linear-gradient(135deg, var(--lila-dark), var(--lila-mid));
+  box-shadow: 0 4px 24px rgba(124,58,237,0.5);
+  font-size: 26px; line-height:1; transition: transform 0.25s, box-shadow 0.2s;
+}
+.fab-main.open { transform: rotate(45deg) scale(1.05); }
+.fab-sub {
+  width: 46px; height: 46px; border-radius: 50%;
+  border: none; cursor: pointer; display:flex; align-items:center; justify-content:center;
+  font-size: 20px; transition: transform 0.2s;
+  box-shadow: 0 3px 16px rgba(0,0,0,0.4);
+}
+.fab-income { background: rgba(74,222,128,0.2); border:1px solid rgba(74,222,128,0.4); }
+.fab-expense { background: rgba(248,113,113,0.2); border:1px solid rgba(248,113,113,0.4); }
+.fab-sub:active { transform: scale(0.9); }
+
+/* RESTOCK BTN on product */
+.restock-btn {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  border: 1px solid var(--border); background: var(--bg-card2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 15px; transition: all 0.2s;
+  color: var(--celeste);
+}
+.restock-btn:active { background: var(--celeste-soft); border-color: var(--celeste); transform: scale(0.92); }
+
+/* INCOME SETTINGS LIST */
+.income-settings-item {
+  display:flex; align-items:center; gap:12px; padding:12px;
+  border-radius:12px; background:var(--bg-card); border:1px solid var(--border);
+  margin-bottom:8px; cursor:pointer; transition:border-color 0.2s;
+}
+.income-settings-item:active { border-color:var(--lila); }
+</style>
+<!-- BUDGET CYCLE MODAL -->
+<div class="modal-overlay" id="budget-cycle-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📅 Ciclo de Presupuesto</div>
+    <div style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin-bottom:20px;">
+      Define el día del mes en que inicia tu ciclo. Por ejemplo si recibes pago el día 12, el ciclo iría del <b>12 de un mes al 11 del siguiente</b>.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Día de inicio del ciclo</label>
+      <select class="form-control" id="cycle-day-select" onchange="updateCyclePreview()">
+        <!-- populated by JS -->
+      </select>
+    </div>
+    <div id="cycle-preview" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--celeste);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Vista previa del ciclo actual</div>
+      <div id="cycle-preview-content"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveBudgetCycle()">Guardar</button>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('budget-cycle-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- INVENTORY CATEGORY LIST MODAL -->
+<div class="modal-overlay" id="inv-cat-list-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div class="modal-title" style="margin:0;">🏷️ Categorías de Inventario</div>
+      <button class="btn btn-secondary btn-sm" onclick="openInvCatModal()">+ Nueva</button>
+    </div>
+    <div id="inv-cat-list-content">
+      <div class="empty-state" style="padding:24px;">
+        <div class="empty-icon">🏷️</div>
+        <div class="empty-text">Crea categorías para organizar<br>tus productos (Supermercado, Farmacia...)</div>
+      </div>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('inv-cat-list-modal')">Cerrar</button>
+  </div>
+</div>
+
+<!-- INVENTORY CATEGORY EDIT MODAL -->
+<div class="modal-overlay" id="inv-cat-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="inv-cat-modal-title">Nueva Categoría</div>
+    <div class="form-group">
+      <label class="form-label">Nombre</label>
+      <input class="form-control" id="inv-cat-name" placeholder="Ej: Supermercado, Farmacia, Ferretería...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ícono</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="inv-cat-icon-picker">
+        <button class="icon-picker active-icon" data-icon="🛒" onclick="selectInvCatIcon(this)">🛒</button>
+        <button class="icon-picker" data-icon="🏪" onclick="selectInvCatIcon(this)">🏪</button>
+        <button class="icon-picker" data-icon="💊" onclick="selectInvCatIcon(this)">💊</button>
+        <button class="icon-picker" data-icon="🍚" onclick="selectInvCatIcon(this)">🍚</button>
+        <button class="icon-picker" data-icon="🧹" onclick="selectInvCatIcon(this)">🧹</button>
+        <button class="icon-picker" data-icon="🧴" onclick="selectInvCatIcon(this)">🧴</button>
+        <button class="icon-picker" data-icon="🧃" onclick="selectInvCatIcon(this)">🧃</button>
+        <button class="icon-picker" data-icon="🐾" onclick="selectInvCatIcon(this)">🐾</button>
+        <button class="icon-picker" data-icon="🔧" onclick="selectInvCatIcon(this)">🔧</button>
+        <button class="icon-picker" data-icon="📦" onclick="selectInvCatIcon(this)">📦</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Vincular a categoría de presupuesto <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+      <select class="form-control" id="inv-cat-budget-id">
+        <option value="">— Sin vincular —</option>
+      </select>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Al reabastecer un producto de esta categoría, el gasto se cargará automáticamente a ese presupuesto.</div>
+    </div>
+    <input type="hidden" id="inv-cat-edit-id">
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveInvCat()">Guardar</button>
+    </div>
+    <div id="inv-cat-delete-row" style="display:none;margin-top:10px;">
+      <button class="btn btn-danger-soft" style="width:100%;" onclick="deleteInvCat()">🗑 Eliminar categoría</button>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('inv-cat-modal');openInvCatListModal()">Cancelar</button>
+  </div>
+</div>
+
+<input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleImportFile(event)">
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toast-icon">✅</span>
+  <span id="toast-text">Guardado</span>
+</div>
+
+<!-- BALANCE HERO + EXTRA INCOME STYLES -->
+<style>
+.balance-hero {
+  background: linear-gradient(135deg, #1a0f3a 0%, #0f2233 100%);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 22px;
+  padding: 22px 20px 18px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(124,58,237,0.2);
+}
+.balance-hero::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(103,232,249,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.balance-hero::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(103,232,249,0.5), rgba(167,139,250,0.5), transparent);
+}
+.balance-hero-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--celeste); margin-bottom: 6px;
+  opacity: 0.8;
+}
+.balance-hero-amount {
+  font-size: 36px; font-weight: 800; font-family: var(--font-mono);
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, #ffffff 0%, var(--celeste) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+.balance-hero-amount.negative {
+  background: linear-gradient(135deg, var(--danger), #fca5a5);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.balance-hero-sub {
+  font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 14px;
+}
+.btn-add-extra {
+  background: rgba(103,232,249,0.1);
+  border: 1px solid rgba(103,232,249,0.3);
+  color: var(--celeste); border-radius: 10px;
+  padding: 8px 16px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: var(--font);
+  transition: all 0.2s;
+}
+.btn-add-extra:active { background: rgba(103,232,249,0.2); transform: scale(0.97); }
+
+/* TRANSACTION ITEM */
+.txn-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.txn-item:last-child { border-bottom: none; padding-bottom: 0; }
+.txn-icon {
+  width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+}
+.txn-icon.income-bg { background: rgba(74,222,128,0.12); }
+.txn-icon.expense-bg { background: rgba(248,113,113,0.1); }
+.txn-icon.adjust-bg { background: rgba(251,191,36,0.1); }
+.txn-info { flex: 1; }
+.txn-name { font-size: 13px; font-weight: 600; }
+.txn-date { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.txn-amount { font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
+.txn-amount.pos { color: var(--success); }
+.txn-amount.neg { color: var(--danger); }
+
+/* BALANCE ADJUST ROW */
+.adjust-row {
+  display: flex; gap: 8px; align-items: center; margin-top: 10px;
+}
+</style>
+
+<!-- EXTRA INCOME MODAL -->
+<div class="modal-overlay" id="extra-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="extra-modal-title">💵 Movimiento de Dinero</div>
+
+    <!-- TYPE SELECTOR -->
+    <div style="display:flex;gap:8px;margin-bottom:18px;">
+      <button class="type-btn active" data-type="income" onclick="selectTxnType('income',this)">📈 Ingreso extra</button>
+      <button class="type-btn" data-type="expense" onclick="selectTxnType('expense',this)">📉 Gasto / Salida</button>
+      <button class="type-btn" data-type="adjust" onclick="selectTxnType('adjust',this)">⚖️ Ajuste saldo</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Descripción</label>
+      <input class="form-control" id="extra-desc" placeholder="Ej: Venta de ropa, Pago recibido...">
+    </div>
+    <div class="form-group">
+      <label class="form-label" id="extra-amount-label">Monto recibido (Q)</label>
+      <input class="form-control" id="extra-amount" type="number" placeholder="0.00" step="0.01" min="0">
+    </div>
+
+    <!-- Solo para "ajuste": saldo nuevo total -->
+    <div class="form-group" id="extra-adjust-note" style="display:none;">
+      <div class="alert-item alert-info" style="margin:0;">
+        <div class="alert-icon">ℹ️</div>
+        <div class="alert-text" style="font-size:12px;">En <b>Ajuste de saldo</b> ingresa el saldo real actual que tienes. La diferencia se registrará como movimiento.</div>
+      </div>
+    </div>
+
+    <div class="form-group" id="extra-budget-group" style="display:none;">
+      <label class="form-label">Categoría de presupuesto</label>
+      <select class="form-control" id="extra-budget-id"></select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Nota (opcional)</label>
+      <input class="form-control" id="extra-note" placeholder="Ej: Guatemorfosis, cliente Juan...">
+    </div>
+
+    <input type="hidden" id="extra-type" value="income">
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveExtraTransaction()">Registrar</button>
+    </div>
+    <br>
+    <button style="width:100%;background:none;border:none;color:var(--text-muted);font-size:13px;padding:8px;cursor:pointer;" onclick="closeModal('extra-modal')">Cancelar</button>
+  </div>
+</div>
+
+<style>
+.type-btn {
+  flex: 1; padding: 9px 6px; border-radius: 10px; font-size: 11px; font-weight: 700;
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-muted); cursor: pointer; font-family: var(--font);
+  transition: all 0.2s; text-align: center;
+}
+.type-btn.active { background: var(--lila-soft); border-color: var(--lila); color: var(--lila); }
+</style>
+
+<style>
+.icon-picker {
+  width: 40px; height: 40px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  cursor: pointer; font-size: 20px; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-picker.active-icon { border-color: var(--lila); background: var(--lila-soft); }
+</style>
+
+<script>
+// ============================================
+// DATA STORE
+// ============================================
+let state = {
+  incomes: [],
+  products: [],
+  balance: 0,
+  transactions: [],
+  budgets: [],          // categorías de presupuesto financiero
+  inventoryCategories: [], // categorías de inventario (supermercado, farmacia, etc.)
+  budgetCycleDay: 1     // día del mes en que inicia el ciclo de presupuesto (1-28)
+};
+let selectedIcon = '💼';
+let importPreviewData = null;
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('mihogar_v1');
+    if (saved) state = JSON.parse(saved);
+    // Ensure arrays/values exist for backward compat
+    if (!state.transactions) state.transactions = [];
+    if (!state.budgets) state.budgets = [];
+    if (!state.inventoryCategories) state.inventoryCategories = [];
+    if (!state.budgetCycleDay) state.budgetCycleDay = 1;
+  } catch(e) { console.warn('Load error', e); }
+}
+
+function saveState() {
+  localStorage.setItem('mihogar_v1', JSON.stringify(state));
+}
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2,5);
+}
+
+// ============================================
+// FORMATTING
+// ============================================
+function fmtQ(n) {
+  return 'Q ' + parseFloat(n || 0).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('es-GT', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function freqLabel(freq) {
+  return { weekly:'Semanal', semimonthly:'Semi-mensual', monthly:'Mensual' }[freq] || freq;
+}
+
+function freqDays(freq) {
+  return { weekly:7, semimonthly:15, monthly:30 }[freq] || 30;
+}
+
+// Returns { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD', label: 'DD/MM – DD/MM' }
+function getBudgetPeriod() {
+  const day = Math.min(Math.max(parseInt(state.budgetCycleDay) || 1, 1), 28);
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+  let startY, startM, endY, endM;
+  if (d >= day) {
+    // current period started this month on 'day'
+    startY = y; startM = m;
+  } else {
+    // current period started last month on 'day'
+    const prev = new Date(y, m - 1, 1);
+    startY = prev.getFullYear(); startM = prev.getMonth();
+  }
+  // end is one day before 'day' of the following month
+  const endStart = new Date(startY, startM + 1, day);
+  const endDate = new Date(endStart.getTime() - 86400000);
+  endY = endDate.getFullYear(); endM = endDate.getMonth();
+  const startDate = new Date(startY, startM, day);
+  const fmt = dt => `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`;
+  return {
+    start: startDate.toISOString().split('T')[0],
+    end: endDate.toISOString().split('T')[0],
+    label: `${fmt(startDate)} – ${fmt(endDate)}`,
+    daysLeft: Math.ceil((endDate - now) / 86400000) + 1
+  };
+}
+
+// For semimonthly, income has day1 and day2 (day of month)
+function nextPayDate(lastDate, freq, day1, day2) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  if (freq === 'semimonthly') {
+    // find next occurrence of day1 or day2 in current or next month
+    const d1 = parseInt(day1) || 1;
+    const d2 = parseInt(day2) || 15;
+    const days = [d1, d2].sort((a,b) => a-b);
+    const y = now.getFullYear(), m = now.getMonth();
+    let candidates = [];
+    [-1, 0, 1].forEach(offset => {
+      days.forEach(d => {
+        const dt = new Date(y, m + offset, d);
+        candidates.push(dt);
+      });
+    });
+    candidates = candidates.filter(dt => dt > now).sort((a,b) => a-b);
+    return candidates[0] ? candidates[0].toISOString().split('T')[0] : null;
+  }
+  if (!lastDate) return null;
+  const d = new Date(lastDate + 'T00:00:00');
+  d.setDate(d.getDate() + freqDays(freq));
+  return d.toISOString().split('T')[0];
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const target = new Date(dateStr + 'T00:00:00');
+  return Math.round((target - now) / 86400000);
+}
+
+function consumeFreqToDailyRate(consumption, freq) {
+  if (!consumption || consumption <= 0) return 0;
+  if (freq === 'weekly') return consumption / 7;
+  if (freq === 'monthly') return consumption / 30;
+  return consumption; // daily
+}
+
+function consumeFreqLabel(freq) {
+  return { daily: 'día', weekly: 'semana', monthly: 'mes' }[freq] || 'día';
+}
+
+function daysLeft(qty, dailyConsumption, consumFreq) {
+  const rate = consumeFreqToDailyRate(dailyConsumption, consumFreq || 'daily');
+  if (!rate || rate <= 0) return Infinity;
+  return qty / rate;
+}
+
+function getProductStatus(p) {
+  const days = daysLeft(p.qty, p.dailyConsumption, p.consumFreq);
+  if (p.qty <= p.minAlert) return 'danger';
+  if (days < 7) return 'danger';
+  if (days < 14) return 'warning';
+  return 'ok';
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+let currentTab = 'dashboard';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-item')[['dashboard','finanzas','inventario','prediccion'].indexOf(tab)].classList.add('active');
+  updateFabVisibility(tab);
+  renderAll();
+}
+
+// ============================================
+// RENDER DASHBOARD
+// ============================================
+function renderDashboard() {
+  // date
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('es-GT', { weekday:'long', day:'numeric', month:'long' });
+
+  // BALANCE
+  const balEl = document.getElementById('stat-balance');
+  const isNeg = state.balance < 0;
+  balEl.className = 'balance-hero-amount' + (isNeg ? ' negative' : '');
+  // Force repaint of gradient text by toggling display
+  balEl.style.display = 'none';
+  balEl.textContent = fmtQ(state.balance);
+  balEl.offsetHeight; // reflow
+  balEl.style.display = '';
+  // Also update finanzas balance display if it exists
+  const finBal = document.getElementById('fin-balance-display');
+  if (finBal) {
+    finBal.textContent = fmtQ(state.balance);
+    finBal.style.color = isNeg ? 'var(--danger)' : 'var(--success)';
+  }
+  const txnCount = (state.transactions || []).length;
+  const lastTxn = txnCount > 0 ? state.transactions[state.transactions.length - 1] : null;
+  document.getElementById('stat-balance-sub').textContent = lastTxn
+    ? `Último mov: ${lastTxn.desc} · ${fmtDate(lastTxn.date)}`
+    : 'Sin movimientos registrados';
+
+  // compute monthly income (projection)
+  let monthly = 0;
+  state.incomes.forEach(inc => {
+    const days = freqDays(inc.freq);
+    const perDay = inc.amount / days;
+    monthly += perDay * 30;
+  });
+  document.getElementById('stat-ingreso').textContent = fmtQ(monthly);
+  document.getElementById('stat-ingreso-hint').textContent = state.incomes.length + ' fuente(s) · proyección';
+  // next income
+  let nextDate = null, nextLabel = '';
+  state.incomes.forEach(inc => {
+    const nd = nextPayDate(inc.lastDate, inc.freq, inc.day1, inc.day2);
+    if (!nd) return;
+    if (!nextDate || nd < nextDate) { nextDate = nd; nextLabel = inc.name; }
+  });
+  if (nextDate) {
+    const d = daysUntil(nextDate);
+    document.getElementById('stat-proximo').textContent = d === 0 ? 'Hoy 🎉' : d === 1 ? 'Mañana' : `${d} días`;
+    document.getElementById('stat-proximo-hint').textContent = nextLabel;
+  } else {
+    document.getElementById('stat-proximo').textContent = '—';
+    document.getElementById('stat-proximo-hint').textContent = 'Sin ingresos';
+  }
+  document.getElementById('stat-ingreso-hint').textContent = state.incomes.length + ' fuente(s)';
+
+  // product stats
+  let ok = 0, alertCount = 0;
+  state.products.forEach(p => {
+    const s = getProductStatus(p);
+    if (s === 'ok') ok++; else alertCount++;
+  });
+  document.getElementById('stat-ok').textContent = ok;
+  document.getElementById('stat-alert').textContent = alertCount;
+
+  // alerts
+  const alertsEl = document.getElementById('alerts-section');
+  let alertsHTML = '';
+  state.products.forEach(p => {
+    const s = getProductStatus(p);
+    if (s === 'danger') {
+      const d = daysLeft(p.qty, p.dailyConsumption, p.consumFreq);
+      alertsHTML += `<div class="alert-item alert-danger">
+        <div class="alert-icon">🚨</div>
+        <div class="alert-text">
+          <div class="alert-title">${p.name} — Stock crítico</div>
+          ${isFinite(d) ? `Se agota en ${Math.round(d)} día(s)` : `Cantidad: ${p.qty} ${p.unit} (mínimo: ${p.minAlert})`}
+        </div>
+      </div>`;
+    } else if (s === 'warning') {
+      const d = daysLeft(p.qty, p.dailyConsumption, p.consumFreq);
+      alertsHTML += `<div class="alert-item alert-warning">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-text">
+          <div class="alert-title">${p.name} — Bajo stock</div>
+          ${isFinite(d) ? `Se agota en aprox. ${Math.round(d)} días` : `Revisar cantidad disponible`}
+        </div>
+      </div>`;
+    }
+  });
+  alertsEl.innerHTML = alertsHTML;
+
+  // critical list
+  const critEl = document.getElementById('critical-list');
+  const critical = state.products.filter(p => getProductStatus(p) !== 'ok');
+  if (critical.length === 0) {
+    critEl.innerHTML = `<div class="empty-state" style="padding:20px;">
+      <div class="empty-icon" style="font-size:28px;">✅</div>
+      <div class="empty-text">Todo en orden</div>
+    </div>`;
+  } else {
+    critEl.innerHTML = critical.slice(0,5).map(p => {
+      const s = getProductStatus(p);
+      const d = daysLeft(p.qty, p.dailyConsumption, p.consumFreq);
+      const badge = s === 'danger' ? 'badge-danger' : 'badge-warn';
+      const label = s === 'danger' ? '🔴 Crítico' : '🟡 Alerta';
+      const catInfo = getInvCatDisplay(p.category);
+      return `<div class="product-item">
+        <div class="product-top">
+          <div><div class="product-name">${p.name}</div>
+          <span class="product-cat">${catInfo.icon} ${catInfo.name}</span></div>
+          <span class="product-badge ${badge}">${label}</span>
+        </div>
+        <div class="product-details">
+          <span>Stock: <b class="product-qty">${p.qty} ${p.unit}</b></span>
+          ${isFinite(d) ? `<span>Dura: <b>${Math.round(d)} días</b></span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // prediction card
+  if (nextDate && state.products.some(p => p.dailyConsumption > 0)) {
+    const dDays = daysUntil(nextDate);
+    const card = document.getElementById('prediction-card');
+    card.style.display = 'block';
+    let html = `<div class="predict-row"><span class="predict-label">Próximo ingreso</span><span class="predict-value" style="color:var(--celeste)">${fmtDate(nextDate)}</span></div>
+    <div class="predict-row"><span class="predict-label">Días restantes</span><span class="predict-value">${dDays} días</span></div>`;
+    const deficit = state.products.filter(p => {
+      const d = daysLeft(p.qty, p.dailyConsumption, p.consumFreq);
+      return isFinite(d) && d < dDays;
+    });
+    if (deficit.length > 0) {
+      html += `<div style="margin-top:10px;"><div class="alert-item alert-warning" style="margin-bottom:0;">
+        <div class="alert-icon">🛒</div>
+        <div class="alert-text"><div class="alert-title">${deficit.length} producto(s) se agotarán antes del próximo ingreso</div>
+        ${deficit.map(p => p.name).join(', ')}</div>
+      </div></div>`;
+    } else if (state.products.length > 0) {
+      html += `<div class="alert-item alert-info" style="margin-top:10px;">
+        <div class="alert-icon">✅</div>
+        <div class="alert-text">Todos los productos duran hasta el próximo ingreso</div>
+      </div>`;
+    }
+    document.getElementById('prediction-content').innerHTML = html;
+  } else {
+    document.getElementById('prediction-card').style.display = 'none';
+  }
+}
+
+// ============================================
+// RENDER FINANZAS
+// ============================================
+function renderFinanzas() {
+  let monthly = 0;
+  state.incomes.forEach(inc => {
+    const days = freqDays(inc.freq);
+    monthly += (inc.amount / days) * 30;
+  });
+  document.getElementById('fin-total').textContent = fmtQ(monthly);
+  const finBal = document.getElementById('fin-balance-display');
+  if (finBal) {
+    finBal.textContent = fmtQ(state.balance);
+    finBal.style.color = state.balance < 0 ? 'var(--danger)' : 'var(--success)';
+  }
+
+  // Budget categories
+  renderBudgetList();
+  renderTransactions();
+  // Update cycle subtitle
+  const cycleSub = document.getElementById('budget-cycle-sub');
+  if (cycleSub) {
+    const period = getBudgetPeriod();
+    const day = state.budgetCycleDay || 1;
+    cycleSub.textContent = day === 1 ? `Ciclo: del 1 al fin de mes · ${period.daysLeft} días restantes` : `Ciclo: del ${day} al ${day - 1} · ${period.daysLeft} días restantes`;
+  }
+
+  // Txn sub — use budget period
+  const txns = state.transactions || [];
+  const period = getBudgetPeriod();
+  const thisPeriod = txns.filter(t => t.date && t.date >= period.start && t.date <= period.end);
+  const totalGastos = thisPeriod.filter(t => t.type === 'expense').reduce((s,t) => s + (t.rawAmount || 0), 0);
+  const totalIngresos = thisPeriod.filter(t => t.type === 'income').reduce((s,t) => s + (t.rawAmount || 0), 0);
+  const sub = document.getElementById('fin-txn-sub');
+  if (sub) sub.textContent = thisPeriod.length > 0
+    ? `Ciclo ${period.label}: +${fmtQ(totalIngresos)} / -${fmtQ(totalGastos)}`
+    : 'Historial de entradas y salidas';
+}
+
+function renderBudgetList() {
+  const el = document.getElementById('budget-list');
+  if (!el) return;
+  if (!state.budgets || state.budgets.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:16px 0 8px;color:var(--text-muted);font-size:13px;">
+      Agrega categorías para controlar tu presupuesto mensual</div>`;
+    return;
+  }
+  const period = getBudgetPeriod();
+  const txns = state.transactions || [];
+  // Show period info header
+  const periodHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 0 10px;margin-bottom:2px;">
+    <div style="font-size:11px;color:var(--text-muted);">📅 Ciclo actual: <span style="color:var(--celeste);font-weight:700;">${period.label}</span></div>
+    <div style="font-size:11px;color:var(--text-muted);">${period.daysLeft > 0 ? `${period.daysLeft} días restantes` : 'Ciclo terminando'}</div>
+  </div>`;
+  const cardsHTML = state.budgets.map(b => {
+    const spent = txns
+      .filter(t => t.type === 'expense' && t.budgetId === b.id && t.date && t.date >= period.start && t.date <= period.end)
+      .reduce((s,t) => s + (t.rawAmount || 0), 0);
+    const pct = b.limit > 0 ? Math.min(100, (spent / b.limit) * 100) : 0;
+    const over = b.limit > 0 && spent > b.limit;
+    const fillClass = pct < 70 ? 'fill-success' : pct < 90 ? 'fill-warning' : 'fill-danger';
+    return `<div class="budget-cat-card" onclick="openBudgetModal('${b.id}')">
+      <div class="budget-top">
+        <div class="budget-icon">${b.icon || '📦'}</div>
+        <div class="budget-name">${b.name}</div>
+        ${over ? `<span style="font-size:10px;font-weight:700;color:var(--danger);background:rgba(248,113,113,0.15);padding:2px 8px;border-radius:99px;">¡Excedido!</span>` : ''}
+      </div>
+      <div class="budget-amounts">
+        <span>Gastado: <span class="budget-spent" style="color:${over?'var(--danger)':'var(--text-primary)'}">${fmtQ(spent)}</span></span>
+        <span>Límite: <b style="font-family:var(--font-mono);">${b.limit > 0 ? fmtQ(b.limit) : 'Sin límite'}</b></span>
+      </div>
+      ${b.limit > 0 ? `<div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${Math.round(pct)}%"></div></div>` : ''}
+    </div>`;
+  }).join('');
+  el.innerHTML = periodHTML + cardsHTML;
+}
+
+function renderTransactions() {
+  const el = document.getElementById('transactions-list');
+  if (!el) return;
+  const txns = (state.transactions || []).slice().reverse(); // más recientes primero
+  if (txns.length === 0) {
+    el.innerHTML = `<div class="empty-state" style="padding:24px;"><div class="empty-icon" style="font-size:30px;">💸</div><div class="empty-text">Sin movimientos aún</div></div>`;
+    return;
+  }
+  el.innerHTML = txns.slice(0, 30).map(t => {
+    const isIncome = t.type === 'income';
+    const isAdjust = t.type === 'adjust';
+    const iconBg = isIncome ? 'income-bg' : isAdjust ? 'adjust-bg' : 'expense-bg';
+    const icon = isIncome ? '📈' : isAdjust ? '⚖️' : '📉';
+    const amtClass = isIncome ? 'pos' : isAdjust ? (t.amount >= 0 ? 'pos' : 'neg') : 'neg';
+    const sign = isIncome ? '+' : isAdjust ? (t.amount >= 0 ? '+' : '') : '-';
+    const displayAmt = isAdjust ? fmtQ(Math.abs(t.amount)) : fmtQ(t.rawAmount);
+    return `<div class="txn-item">
+      <div class="txn-icon ${iconBg}">${icon}</div>
+      <div class="txn-info">
+        <div class="txn-name">${t.desc}</div>
+        <div class="txn-date">${fmtDate(t.date)}${t.note ? ' · ' + t.note : ''}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="txn-amount ${amtClass}">${sign}${displayAmt}</div>
+        <div style="font-size:10px;color:var(--text-muted);">Saldo: ${fmtQ(t.balanceAfter)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================
+// EXTRA TRANSACTIONS
+// ============================================
+function openExtraModal(defaultType) {
+  document.getElementById('extra-desc').value = '';
+  document.getElementById('extra-amount').value = '';
+  document.getElementById('extra-note').value = '';
+  const type = defaultType || 'income';
+  document.getElementById('extra-type').value = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.type-btn[data-type="${type}"]`).classList.add('active');
+  const labels = { income: 'Monto recibido (Q)', expense: 'Monto del gasto (Q)', adjust: 'Saldo real actual (Q)' };
+  document.getElementById('extra-amount-label').textContent = labels[type];
+  document.getElementById('extra-adjust-note').style.display = type === 'adjust' ? 'block' : 'none';
+  // populate budget select if expense
+  renderBudgetSelect(type);
+  openModal('extra-modal');
+}
+
+function selectTxnType(type, btn) {
+  document.getElementById('extra-type').value = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const labels = { income: 'Monto recibido (Q)', expense: 'Monto del gasto (Q)', adjust: 'Saldo real actual (Q)' };
+  document.getElementById('extra-amount-label').textContent = labels[type];
+  document.getElementById('extra-adjust-note').style.display = type === 'adjust' ? 'block' : 'none';
+  renderBudgetSelect(type);
+}
+
+function renderBudgetSelect(type) {
+  const grp = document.getElementById('extra-budget-group');
+  if (!grp) return;
+  if (type === 'expense' && state.budgets && state.budgets.length > 0) {
+    grp.style.display = 'block';
+    const sel = document.getElementById('extra-budget-id');
+    sel.innerHTML = '<option value="">— Sin categoría —</option>' +
+      state.budgets.map(b => `<option value="${b.id}">${b.icon} ${b.name}</option>`).join('');
+  } else {
+    grp.style.display = 'none';
+  }
+}
+
+function saveExtraTransaction() {
+  const desc = document.getElementById('extra-desc').value.trim();
+  const rawAmount = parseFloat(document.getElementById('extra-amount').value);
+  const note = document.getElementById('extra-note').value.trim();
+  const type = document.getElementById('extra-type').value;
+  const budgetId = document.getElementById('extra-budget-id') ? document.getElementById('extra-budget-id').value : '';
+  if (!desc) { showToast('⚠️', 'Agrega una descripción'); return; }
+  if (isNaN(rawAmount) || rawAmount < 0) { showToast('⚠️', 'Monto inválido'); return; }
+
+  if (!state.transactions) state.transactions = [];
+  let delta = 0;
+  if (type === 'income') delta = rawAmount;
+  else if (type === 'expense') delta = -rawAmount;
+  else if (type === 'adjust') delta = rawAmount - state.balance;
+
+  state.balance = parseFloat((state.balance + delta).toFixed(2));
+
+  state.transactions.push({
+    id: generateId(), type, desc, rawAmount,
+    amount: parseFloat(delta.toFixed(2)),
+    note, date: today(),
+    balanceAfter: state.balance,
+    budgetId: type === 'expense' ? budgetId : ''
+  });
+
+  saveState(); closeModal('extra-modal'); renderAll();
+  const labels = { income: '💚 Ingreso registrado', expense: '🔴 Gasto registrado', adjust: '⚖️ Saldo ajustado' };
+  showToast('✅', labels[type]);
+}
+let currentFilter = 'all';
+
+function filterProducts(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderInventario();
+}
+
+function renderInventario() {
+  const el = document.getElementById('products-list');
+  let filtered = state.products;
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(p => getProductStatus(p) === currentFilter);
+  }
+  if (filtered.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-text">${currentFilter === 'all' ? 'Agrega productos<br>para controlar tu inventario' : 'No hay productos en esta categoría'}</div></div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(p => {
+    const s = getProductStatus(p);
+    const d = daysLeft(p.qty, p.dailyConsumption, p.consumFreq);
+    const badge = s === 'ok' ? 'badge-ok' : s === 'warning' ? 'badge-warn' : 'badge-danger';
+    const badgeText = s === 'ok' ? '🟢 OK' : s === 'warning' ? '🟡 Alerta' : '🔴 Crítico';
+    const pct = p.minAlert > 0 ? Math.min(100, (p.qty / (p.minAlert * 3)) * 100) : (isFinite(d) ? Math.min(100, (d / 30) * 100) : 100);
+    const fillClass = s === 'ok' ? 'fill-success' : s === 'warning' ? 'fill-warning' : 'fill-danger';
+    const freqLbl = consumeFreqLabel(p.consumFreq || 'daily');
+    const catInfo = getInvCatDisplay(p.category);
+    return `<div class="product-item">
+      <div class="product-top">
+        <div style="flex:1;cursor:pointer;" onclick="openProductModal('${p.id}')">
+          <div class="product-name">${p.name}</div>
+          <span class="product-cat">${catInfo.icon} ${catInfo.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="product-badge ${badge}">${badgeText}</span>
+          <button class="restock-btn" onclick="event.stopPropagation();openRestockModal('${p.id}')" title="Reabastecer">＋</button>
+        </div>
+      </div>
+      <div class="product-details" style="cursor:pointer;" onclick="openProductModal('${p.id}')">
+        <span>Stock: <b class="product-qty">${p.qty} ${p.unit}</b></span>
+        ${p.dailyConsumption > 0 ? `<span>Consumo: ${p.dailyConsumption}/${p.unit}/${freqLbl}</span>` : ''}
+        ${isFinite(d) ? `<span>Dura: <b>${Math.round(d)} días</b></span>` : ''}
+        ${p.price > 0 ? `<span>Q ${p.price}</span>` : ''}
+      </div>
+      <div class="progress-bar" style="cursor:pointer;" onclick="openProductModal('${p.id}')"><div class="progress-fill ${fillClass}" style="width:${Math.round(pct)}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================
+// RESTOCK
+// ============================================
+function openRestockModal(id) {
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('restock-product-id').value = id;
+  document.getElementById('restock-modal-title').textContent = `📦 Reabastecer: ${p.name}`;
+  document.getElementById('restock-product-name').textContent = p.name;
+  document.getElementById('restock-current-qty').textContent = `${p.qty} ${p.unit}`;
+
+  // Resolve category icon (custom or default)
+  const invCat = (state.inventoryCategories || []).find(c => c.id === p.category || c.name === p.category);
+  const defaultEmojis = {'Alimentos':'🍚','Limpieza':'🧹','Higiene':'🧴','Bebidas':'🧃','Otros':'📦'};
+  document.getElementById('restock-emoji').textContent = invCat ? (invCat.icon || '📦') : (defaultEmojis[p.category] || '📦');
+
+  document.getElementById('restock-qty').value = '';
+  document.getElementById('restock-cost').value = '';
+
+  // Budget select: show if budgets exist
+  const budgetGroup = document.getElementById('restock-budget-group');
+  const budgetSel = document.getElementById('restock-budget-id');
+  if (state.budgets && state.budgets.length > 0) {
+    budgetGroup.style.display = 'block';
+    budgetSel.innerHTML = '<option value="">— Sin categoría —</option>' +
+      state.budgets.map(b => `<option value="${b.id}">${b.icon || ''} ${b.name}</option>`).join('');
+    // Auto-select if the inventory category is linked to a budget
+    const linkedBudgetId = invCat ? (invCat.budgetId || '') : '';
+    budgetSel.value = linkedBudgetId;
+  } else {
+    budgetGroup.style.display = 'none';
+  }
+  openModal('restock-modal');
+}
+
+function saveRestock() {
+  const id = document.getElementById('restock-product-id').value;
+  const qty = parseFloat(document.getElementById('restock-qty').value);
+  const cost = parseFloat(document.getElementById('restock-cost').value) || 0;
+  const budgetId = document.getElementById('restock-budget-id') ? document.getElementById('restock-budget-id').value : '';
+  if (!id || isNaN(qty) || qty <= 0) { showToast('⚠️', 'Ingresa una cantidad válida'); return; }
+  const idx = state.products.findIndex(p => p.id === id);
+  if (idx < 0) return;
+  const p = state.products[idx];
+  state.products[idx] = { ...p, qty: parseFloat((p.qty + qty).toFixed(4)) };
+  // Register cost as expense if provided
+  if (cost > 0) {
+    if (!state.transactions) state.transactions = [];
+    state.balance = parseFloat((state.balance - cost).toFixed(2));
+    state.transactions.push({
+      id: generateId(), type: 'expense',
+      desc: `Compra: ${p.name} (+${qty} ${p.unit})`,
+      rawAmount: cost, amount: -cost,
+      note: '', date: today(), balanceAfter: state.balance,
+      budgetId: budgetId || ''
+    });
+  }
+  saveState(); closeModal('restock-modal'); renderAll();
+  showToast('✅', `+${qty} ${p.unit} de ${p.name}`);
+}
+
+// ============================================
+// BUDGET CYCLE CONFIG
+// ============================================
+function openBudgetCycleModal() {
+  const sel = document.getElementById('cycle-day-select');
+  sel.innerHTML = '';
+  for (let d = 1; d <= 28; d++) {
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d === 1 ? `Día 1 (inicio de mes)` : `Día ${d}`;
+    if (d === (state.budgetCycleDay || 1)) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  updateCyclePreview();
+  openModal('budget-cycle-modal');
+}
+
+function updateCyclePreview() {
+  const day = parseInt(document.getElementById('cycle-day-select').value) || 1;
+  // Temporarily override to preview
+  const original = state.budgetCycleDay;
+  state.budgetCycleDay = day;
+  const period = getBudgetPeriod();
+  state.budgetCycleDay = original;
+  const txns = state.transactions || [];
+  const periodTxns = txns.filter(t => t.date && t.date >= period.start && t.date <= period.end);
+  const gastos = periodTxns.filter(t => t.type === 'expense').reduce((s,t) => s + (t.rawAmount || 0), 0);
+  document.getElementById('cycle-preview-content').innerHTML = `
+    <div class="predict-row"><span class="predict-label">Inicio del ciclo</span><span class="predict-value" style="color:var(--celeste)">${fmtDate(period.start)}</span></div>
+    <div class="predict-row"><span class="predict-label">Fin del ciclo</span><span class="predict-value" style="color:var(--celeste)">${fmtDate(period.end)}</span></div>
+    <div class="predict-row"><span class="predict-label">Días restantes</span><span class="predict-value">${Math.max(0, period.daysLeft)} días</span></div>
+    <div class="predict-row" style="border:none;padding-bottom:0;"><span class="predict-label">Gastos en este ciclo</span><span class="predict-value" style="color:var(--danger)">${fmtQ(gastos)}</span></div>`;
+}
+
+function saveBudgetCycle() {
+  state.budgetCycleDay = parseInt(document.getElementById('cycle-day-select').value) || 1;
+  saveState();
+  closeModal('budget-cycle-modal');
+  renderAll();
+  const day = state.budgetCycleDay;
+  showToast('📅', day === 1 ? 'Ciclo: del 1 al fin de mes' : `Ciclo: del día ${day} al ${day - 1}`);
+}
+
+// ============================================
+// INVENTORY CATEGORIES
+// ============================================
+let selectedInvCatIcon = '🛒';
+
+function getInvCatDisplay(catIdOrName) {
+  // Try to find custom category by id or name
+  const customs = state.inventoryCategories || [];
+  const found = customs.find(c => c.id === catIdOrName || c.name === catIdOrName);
+  if (found) return { icon: found.icon || '📦', name: found.name };
+  // Fallback defaults
+  const defaults = {'Alimentos':{ icon:'🍚', name:'Alimentos' },'Limpieza':{ icon:'🧹', name:'Limpieza' },'Higiene':{ icon:'🧴', name:'Higiene' },'Bebidas':{ icon:'🧃', name:'Bebidas' },'Otros':{ icon:'📦', name:'Otros' }};
+  return defaults[catIdOrName] || { icon: '📦', name: catIdOrName || 'Sin categoría' };
+}
+
+function openInvCatListModal() {
+  renderInvCatList();
+  openModal('inv-cat-list-modal');
+}
+
+function renderInvCatList() {
+  const el = document.getElementById('inv-cat-list-content');
+  if (!el) return;
+  const cats = state.inventoryCategories || [];
+  if (cats.length === 0) {
+    el.innerHTML = `<div class="empty-state" style="padding:24px;"><div class="empty-icon">🏷️</div><div class="empty-text">Crea categorías para organizar<br>tus productos (Supermercado, Farmacia...)</div></div>`;
+    return;
+  }
+  el.innerHTML = cats.map(c => {
+    const prodCount = state.products.filter(p => p.category === c.id || p.category === c.name).length;
+    const linkedBudget = c.budgetId ? (state.budgets || []).find(b => b.id === c.budgetId) : null;
+    return `<div class="income-settings-item" onclick="openInvCatModal('${c.id}')">
+      <div style="font-size:24px;">${c.icon || '📦'}</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;">${c.name}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
+          ${prodCount} producto(s)
+          ${linkedBudget ? ` · 💳 ${linkedBudget.icon || ''} ${linkedBudget.name}` : ''}
+        </div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><path d="M9 18l6-6-6-6"/></svg>
+    </div>`;
+  }).join('');
+}
+
+function openInvCatModal(id) {
+  selectedInvCatIcon = '🛒';
+  document.getElementById('inv-cat-edit-id').value = '';
+  document.getElementById('inv-cat-modal-title').textContent = 'Nueva Categoría';
+  document.getElementById('inv-cat-name').value = '';
+  document.getElementById('inv-cat-delete-row').style.display = 'none';
+  // Populate budget select
+  const budSel = document.getElementById('inv-cat-budget-id');
+  budSel.innerHTML = '<option value="">— Sin vincular —</option>' +
+    (state.budgets || []).map(b => `<option value="${b.id}">${b.icon || ''} ${b.name}</option>`).join('');
+  // Reset icon picker
+  document.querySelectorAll('#inv-cat-icon-picker .icon-picker').forEach(b => {
+    b.classList.toggle('active-icon', b.dataset.icon === selectedInvCatIcon);
+  });
+  if (id) {
+    const cat = (state.inventoryCategories || []).find(c => c.id === id);
+    if (cat) {
+      document.getElementById('inv-cat-edit-id').value = cat.id;
+      document.getElementById('inv-cat-modal-title').textContent = 'Editar Categoría';
+      document.getElementById('inv-cat-name').value = cat.name;
+      selectedInvCatIcon = cat.icon || '🛒';
+      budSel.value = cat.budgetId || '';
+      document.querySelectorAll('#inv-cat-icon-picker .icon-picker').forEach(b => {
+        b.classList.toggle('active-icon', b.dataset.icon === selectedInvCatIcon);
+      });
+      document.getElementById('inv-cat-delete-row').style.display = 'block';
+    }
+  }
+  closeModal('inv-cat-list-modal');
+  openModal('inv-cat-modal');
+}
+
+function selectInvCatIcon(btn) {
+  selectedInvCatIcon = btn.dataset.icon;
+  document.querySelectorAll('#inv-cat-icon-picker .icon-picker').forEach(b => b.classList.remove('active-icon'));
+  btn.classList.add('active-icon');
+}
+
+function saveInvCat() {
+  const name = document.getElementById('inv-cat-name').value.trim();
+  const budgetId = document.getElementById('inv-cat-budget-id').value;
+  const editId = document.getElementById('inv-cat-edit-id').value;
+  if (!name) { showToast('⚠️', 'Ingresa un nombre'); return; }
+  if (!state.inventoryCategories) state.inventoryCategories = [];
+  // Check for duplicate name (excluding self when editing)
+  const dup = state.inventoryCategories.find(c => c.name.toLowerCase() === name.toLowerCase() && c.id !== editId);
+  if (dup) { showToast('⚠️', 'Ya existe una categoría con ese nombre'); return; }
+  if (editId) {
+    const idx = state.inventoryCategories.findIndex(c => c.id === editId);
+    if (idx >= 0) {
+      const oldName = state.inventoryCategories[idx].name;
+      state.inventoryCategories[idx] = { ...state.inventoryCategories[idx], name, icon: selectedInvCatIcon, budgetId };
+      // Update products that used the old name (for backward compat)
+      state.products.forEach(p => { if (p.category === oldName) p.category = editId; });
+    }
+  } else {
+    const newId = generateId();
+    state.inventoryCategories.push({ id: newId, name, icon: selectedInvCatIcon, budgetId });
+  }
+  saveState();
+  closeModal('inv-cat-modal');
+  openInvCatListModal();
+  renderAll();
+  showToast('✅', editId ? 'Categoría actualizada' : 'Categoría creada');
+}
+
+function deleteInvCat() {
+  const id = document.getElementById('inv-cat-edit-id').value;
+  if (!id) return;
+  const cat = (state.inventoryCategories || []).find(c => c.id === id);
+  const prodCount = cat ? state.products.filter(p => p.category === id || p.category === cat.name).length : 0;
+  const msg = prodCount > 0
+    ? `¿Eliminar "${cat.name}"? ${prodCount} producto(s) quedarán sin categoría.`
+    : `¿Eliminar la categoría "${cat ? cat.name : ''}"?`;
+  if (!confirm(msg)) return;
+  state.inventoryCategories = (state.inventoryCategories || []).filter(c => c.id !== id);
+  // Products keep their category id (will show as "Sin categoría" gracefully)
+  saveState();
+  closeModal('inv-cat-modal');
+  openInvCatListModal();
+  renderAll();
+  showToast('🗑', 'Categoría eliminada');
+}
+
+// ============================================
+// BUDGET CATEGORIES
+// ============================================
+let selectedBudgetIcon = '🛒';
+
+function openBudgetModal(id) {
+  selectedBudgetIcon = '🛒';
+  document.getElementById('bud-edit-id').value = '';
+  document.getElementById('budget-modal-title').textContent = 'Nueva Categoría';
+  document.getElementById('bud-name').value = '';
+  document.getElementById('bud-limit').value = '';
+  document.getElementById('bud-delete-row').style.display = 'none';
+  document.querySelectorAll('.icon-picker[data-icon]').forEach(b => {
+    b.classList.toggle('active-icon', b.dataset.icon === selectedBudgetIcon);
+  });
+  if (id) {
+    const b = (state.budgets || []).find(x => x.id === id);
+    if (b) {
+      document.getElementById('bud-edit-id').value = b.id;
+      document.getElementById('budget-modal-title').textContent = 'Editar Categoría';
+      document.getElementById('bud-name').value = b.name;
+      document.getElementById('bud-limit').value = b.limit || '';
+      selectedBudgetIcon = b.icon || '🛒';
+      document.querySelectorAll('#budget-modal .icon-picker').forEach(btn => {
+        btn.classList.toggle('active-icon', btn.dataset.icon === selectedBudgetIcon);
+      });
+      document.getElementById('bud-delete-row').style.display = 'block';
+    }
+  }
+  openModal('budget-modal');
+}
+
+function selectBudgetIcon(btn) {
+  selectedBudgetIcon = btn.dataset.icon;
+  document.querySelectorAll('#budget-modal .icon-picker').forEach(b => b.classList.remove('active-icon'));
+  btn.classList.add('active-icon');
+}
+
+function saveBudgetCategory() {
+  const name = document.getElementById('bud-name').value.trim();
+  const limit = parseFloat(document.getElementById('bud-limit').value) || 0;
+  const editId = document.getElementById('bud-edit-id').value;
+  if (!name) { showToast('⚠️', 'Ingresa un nombre'); return; }
+  if (!state.budgets) state.budgets = [];
+  if (editId) {
+    const idx = state.budgets.findIndex(b => b.id === editId);
+    if (idx >= 0) state.budgets[idx] = { ...state.budgets[idx], name, icon: selectedBudgetIcon, limit };
+  } else {
+    state.budgets.push({ id: generateId(), name, icon: selectedBudgetIcon, limit });
+  }
+  saveState(); closeModal('budget-modal'); renderAll();
+  showToast('✅', editId ? 'Categoría actualizada' : 'Categoría creada');
+}
+
+function deleteBudgetCategory() {
+  const id = document.getElementById('bud-edit-id').value;
+  if (!id) return;
+  if (!confirm('¿Eliminar esta categoría?')) return;
+  state.budgets = state.budgets.filter(b => b.id !== id);
+  saveState(); closeModal('budget-modal'); renderAll();
+  showToast('🗑', 'Categoría eliminada');
+}
+
+// ============================================
+// INCOME SETTINGS MODAL
+// ============================================
+function openIncomeSettingsModal() {
+  renderIncomeSettingsList();
+  openModal('income-settings-modal');
+}
+
+function renderIncomeSettingsList() {
+  const el = document.getElementById('income-settings-list');
+  if (!el) return;
+  if (state.incomes.length === 0) {
+    el.innerHTML = `<div class="empty-state" style="padding:24px;"><div class="empty-icon">💳</div><div class="empty-text">Agrega tus fuentes de ingreso</div></div>`;
+    return;
+  }
+  el.innerHTML = state.incomes.map(inc => {
+    const nd = nextPayDate(inc.lastDate, inc.freq, inc.day1, inc.day2);
+    const d = nd ? daysUntil(nd) : null;
+    return `<div class="income-settings-item" onclick="closeModal('income-settings-modal');openIncomeModal('${inc.id}')">
+      <div style="font-size:22px;">${inc.icon || '💼'}</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;">${inc.name}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
+          <span class="freq-tag">${freqLabel(inc.freq)}</span>
+          ${d !== null ? ` · Próximo: ${d === 0 ? '¡Hoy!' : d === 1 ? 'Mañana' : `en ${d} días`}` : ''}
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:var(--font-mono);font-weight:700;color:var(--success);font-size:14px;">${fmtQ(inc.amount)}</div>
+        <div style="font-size:10px;color:var(--text-muted);">por pago</div>
+      </div>
+    </div>`;
+  }).join('') +
+  `<button class="btn btn-secondary" style="width:100%;margin-top:8px;" onclick="closeModal('income-settings-modal');openIncomeModal()">+ Agregar nuevo ingreso</button>`;
+}
+
+// ============================================
+// FAB VISIBILITY (dashboard only)
+// ============================================
+function updateFabVisibility(tab) {
+  const fab = document.getElementById('fab-group');
+  if (fab) fab.style.display = tab === 'dashboard' ? 'flex' : 'none';
+}
+
+// ============================================
+// RENDER PREDICCION
+// ============================================
+function renderPrediccion() {
+  // income info
+  const incEl = document.getElementById('pred-income-info');
+  let nextDate = null, nextName = '', nextAmt = 0;
+  state.incomes.forEach(inc => {
+    const nd = nextPayDate(inc.lastDate, inc.freq, inc.day1, inc.day2);
+    if (!nd) return;
+    if (!nextDate || nd < nextDate) { nextDate = nd; nextName = inc.name; nextAmt = inc.amount; }
+  });
+  if (nextDate) {
+    const d = daysUntil(nextDate);
+    incEl.innerHTML = `
+      <div class="predict-row"><span class="predict-label">Fuente</span><span class="predict-value">${nextName}</span></div>
+      <div class="predict-row"><span class="predict-label">Monto esperado</span><span class="predict-value" style="color:var(--success)">${fmtQ(nextAmt)}</span></div>
+      <div class="predict-row"><span class="predict-label">Fecha estimada</span><span class="predict-value">${fmtDate(nextDate)}</span></div>
+      <div class="predict-row"><span class="predict-label">Días restantes</span><span class="predict-value" style="color:${d<=3?'var(--danger)':d<=7?'var(--warning)':'var(--celeste)'}">${d} días</span></div>`;
+  } else {
+    incEl.innerHTML = `<div style="color:var(--text-muted);font-size:13px;">Registra ingresos con fecha de último pago</div>`;
+  }
+
+  // products duration
+  const prodEl = document.getElementById('pred-products-list');
+  const withConsumption = state.products.filter(p => p.dailyConsumption > 0);
+  if (withConsumption.length === 0) {
+    prodEl.innerHTML = `<div style="color:var(--text-muted);font-size:13px;">Registra productos con consumo estimado</div>`;
+  } else {
+    const daysToIncome = nextDate ? daysUntil(nextDate) : null;
+    prodEl.innerHTML = withConsumption.map(p => {
+      const d = daysLeft(p.qty, p.dailyConsumption, p.consumFreq);
+      const safe = daysToIncome ? d >= daysToIncome : true;
+      const color = safe ? 'var(--success)' : 'var(--danger)';
+      return `<div class="predict-row">
+        <span class="predict-label">${p.name}</span>
+        <div style="text-align:right;">
+          <div class="predict-value" style="color:${color}">${Math.round(d)} días</div>
+          <div style="font-size:10px;color:var(--text-muted)">${safe ? '✅ alcanza' : '❌ se agota antes'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // recommendations
+  const recEl = document.getElementById('pred-rec-list');
+  const daysToIncome = nextDate ? daysUntil(nextDate) : 14;
+  const needsBuy = state.products.filter(p => {
+    if (p.dailyConsumption <= 0) return getProductStatus(p) === 'danger';
+    return daysLeft(p.qty, p.dailyConsumption, p.consumFreq) < daysToIncome;
+  });
+  if (needsBuy.length === 0) {
+    recEl.innerHTML = `<div class="alert-item alert-info" style="margin:0;"><div class="alert-icon">🎉</div><div class="alert-text">¡No necesitas comprar nada urgente por ahora!</div></div>`;
+  } else {
+    recEl.innerHTML = needsBuy.map(p => {
+      const d = daysLeft(p.qty, p.dailyConsumption, p.consumFreq);
+      const dailyRate = consumeFreqToDailyRate(p.dailyConsumption, p.consumFreq || 'daily');
+      const needed = isFinite(d) && dailyRate > 0 ? Math.ceil((daysToIncome - d) * dailyRate) : '—';
+      return `<div class="alert-item alert-warning" style="margin-bottom:8px;">
+        <div class="alert-icon">🛒</div>
+        <div class="alert-text">
+          <div class="alert-title">${p.name}</div>
+          <div>Comprar: <b>${typeof needed === 'number' ? needed + ' ' + p.unit : 'verificar stock'}</b>
+          ${p.price > 0 && typeof needed === 'number' ? ` · Est. ${fmtQ(needed * p.price)}` : ''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ============================================
+// RENDER ALL
+// ============================================
+function renderAll() {
+  if (currentTab === 'dashboard') renderDashboard();
+  else if (currentTab === 'finanzas') renderFinanzas();
+  else if (currentTab === 'inventario') renderInventario();
+  else if (currentTab === 'prediccion') renderPrediccion();
+  // if income settings modal is open, refresh it
+  const ism = document.getElementById('income-settings-modal');
+  if (ism && ism.classList.contains('open')) renderIncomeSettingsList();
+}
+
+// ============================================
+// INCOME CRUD
+// ============================================
+function populateDaySelects() {
+  ['inc-day1','inc-day2'].forEach((id, i) => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '';
+    for (let d = 1; d <= 31; d++) {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = `Día ${d}`;
+      if ((i === 0 && d === 1) || (i === 1 && d === 15)) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  });
+}
+
+function onFreqChange() {
+  const freq = document.getElementById('inc-freq').value;
+  const isSemi = freq === 'semimonthly';
+  document.getElementById('inc-lastdate-group').style.display = isSemi ? 'none' : 'block';
+  document.getElementById('inc-semimonthly-group').style.display = isSemi ? 'block' : 'none';
+}
+
+function openIncomeModal(id) {
+  populateDaySelects();
+  document.getElementById('inc-edit-id').value = '';
+  document.getElementById('income-modal-title').textContent = 'Nuevo Ingreso';
+  document.getElementById('inc-name').value = '';
+  document.getElementById('inc-amount').value = '';
+  document.getElementById('inc-freq').value = 'semimonthly';
+  document.getElementById('inc-lastdate').value = today();
+  document.getElementById('inc-delete-row').style.display = 'none';
+  selectedIcon = '💼';
+  document.querySelectorAll('.icon-picker').forEach(b => {
+    b.classList.toggle('active-icon', b.dataset.icon === selectedIcon);
+  });
+  onFreqChange();
+  if (id) {
+    const inc = state.incomes.find(i => i.id === id);
+    if (inc) {
+      document.getElementById('inc-edit-id').value = inc.id;
+      document.getElementById('income-modal-title').textContent = 'Editar Ingreso';
+      document.getElementById('inc-name').value = inc.name;
+      document.getElementById('inc-amount').value = inc.amount;
+      document.getElementById('inc-freq').value = inc.freq;
+      document.getElementById('inc-lastdate').value = inc.lastDate || today();
+      if (inc.day1) document.getElementById('inc-day1').value = inc.day1;
+      if (inc.day2) document.getElementById('inc-day2').value = inc.day2;
+      selectedIcon = inc.icon || '💼';
+      document.querySelectorAll('.icon-picker').forEach(b => {
+        b.classList.toggle('active-icon', b.dataset.icon === selectedIcon);
+      });
+      document.getElementById('inc-delete-row').style.display = 'block';
+      onFreqChange();
+    }
+  }
+  openModal('income-modal');
+}
+
+function selectIcon(btn) {
+  selectedIcon = btn.dataset.icon;
+  document.querySelectorAll('.icon-picker').forEach(b => b.classList.remove('active-icon'));
+  btn.classList.add('active-icon');
+}
+
+function saveIncome() {
+  const name = document.getElementById('inc-name').value.trim();
+  const amount = parseFloat(document.getElementById('inc-amount').value);
+  const freq = document.getElementById('inc-freq').value;
+  const lastDate = document.getElementById('inc-lastdate').value;
+  const day1 = freq === 'semimonthly' ? parseInt(document.getElementById('inc-day1').value) : null;
+  const day2 = freq === 'semimonthly' ? parseInt(document.getElementById('inc-day2').value) : null;
+  const editId = document.getElementById('inc-edit-id').value;
+  if (!name || isNaN(amount) || amount <= 0) { showToast('⚠️', 'Completa todos los campos'); return; }
+  if (freq === 'semimonthly' && day1 === day2) { showToast('⚠️', 'Las dos fechas deben ser diferentes'); return; }
+  const incData = { name, amount, freq, lastDate: freq !== 'semimonthly' ? lastDate : null, day1, day2, icon: selectedIcon };
+  if (editId) {
+    const idx = state.incomes.findIndex(i => i.id === editId);
+    if (idx >= 0) state.incomes[idx] = { ...state.incomes[idx], ...incData };
+  } else {
+    state.incomes.push({ id: generateId(), ...incData });
+  }
+  saveState(); closeModal('income-modal'); renderAll();
+  showToast('✅', editId ? 'Ingreso actualizado' : 'Ingreso guardado');
+}
+
+function deleteIncome() {
+  const id = document.getElementById('inc-edit-id').value;
+  if (!id) return;
+  if (!confirm('¿Eliminar este ingreso?')) return;
+  state.incomes = state.incomes.filter(i => i.id !== id);
+  saveState(); closeModal('income-modal'); renderAll();
+  showToast('🗑', 'Ingreso eliminado');
+}
+
+// ============================================
+// PRODUCT CRUD
+// ============================================
+function populateProdCatSelect(selectedValue) {
+  const sel = document.getElementById('prod-cat');
+  // Default categories always present
+  const defaults = [
+    { id: 'Alimentos', name: 'Alimentos', icon: '🍚' },
+    { id: 'Limpieza', name: 'Limpieza', icon: '🧹' },
+    { id: 'Higiene', name: 'Higiene', icon: '🧴' },
+    { id: 'Bebidas', name: 'Bebidas', icon: '🧃' },
+    { id: 'Otros', name: 'Otros', icon: '📦' }
+  ];
+  const customs = (state.inventoryCategories || []);
+  // Build options: custom cats first, then defaults not already overridden
+  const customNames = new Set(customs.map(c => c.name));
+  const allOptions = [
+    ...customs.map(c => ({ id: c.id, name: c.name, icon: c.icon || '📦' })),
+    ...defaults.filter(d => !customNames.has(d.name))
+  ];
+  sel.innerHTML = allOptions.map(o =>
+    `<option value="${o.id}" ${o.id === selectedValue || o.name === selectedValue ? 'selected' : ''}>${o.icon} ${o.name}</option>`
+  ).join('');
+}
+
+function openProductModal(id) {
+  document.getElementById('prod-edit-id').value = '';
+  document.getElementById('product-modal-title').textContent = 'Nuevo Producto';
+  document.getElementById('prod-name').value = '';
+  document.getElementById('prod-qty').value = '';
+  document.getElementById('prod-unit').value = 'unidades';
+  document.getElementById('prod-daily').value = '';
+  document.getElementById('prod-consume-freq').value = 'daily';
+  document.getElementById('prod-min').value = '';
+  document.getElementById('prod-price').value = '';
+  document.getElementById('prod-delete-row').style.display = 'none';
+  populateProdCatSelect('');
+  if (id) {
+    const p = state.products.find(x => x.id === id);
+    if (p) {
+      document.getElementById('prod-edit-id').value = p.id;
+      document.getElementById('product-modal-title').textContent = 'Editar Producto';
+      document.getElementById('prod-name').value = p.name;
+      populateProdCatSelect(p.category);
+      document.getElementById('prod-qty').value = p.qty;
+      document.getElementById('prod-unit').value = p.unit;
+      document.getElementById('prod-daily').value = p.dailyConsumption;
+      document.getElementById('prod-consume-freq').value = p.consumFreq || 'daily';
+      document.getElementById('prod-min').value = p.minAlert;
+      document.getElementById('prod-price').value = p.price || '';
+      document.getElementById('prod-delete-row').style.display = 'block';
+    }
+  }
+  openModal('product-modal');
+}
+
+function saveProduct() {
+  const name = document.getElementById('prod-name').value.trim();
+  const category = document.getElementById('prod-cat').value;
+  const qty = parseFloat(document.getElementById('prod-qty').value);
+  const unit = document.getElementById('prod-unit').value;
+  const dailyConsumption = parseFloat(document.getElementById('prod-daily').value) || 0;
+  const consumFreq = document.getElementById('prod-consume-freq').value || 'daily';
+  const minAlert = parseFloat(document.getElementById('prod-min').value) || 0;
+  const price = parseFloat(document.getElementById('prod-price').value) || 0;
+  const editId = document.getElementById('prod-edit-id').value;
+  if (!name || isNaN(qty)) { showToast('⚠️', 'Nombre y cantidad son requeridos'); return; }
+  if (editId) {
+    const idx = state.products.findIndex(p => p.id === editId);
+    if (idx >= 0) state.products[idx] = { ...state.products[idx], name, category, qty, unit, dailyConsumption, consumFreq, minAlert, price };
+  } else {
+    state.products.push({ id: generateId(), name, category, qty, unit, dailyConsumption, consumFreq, minAlert, price });
+  }
+  saveState(); closeModal('product-modal'); renderAll();
+  showToast('✅', editId ? 'Producto actualizado' : 'Producto guardado');
+}
+
+function deleteProduct() {
+  const id = document.getElementById('prod-edit-id').value;
+  if (!id) return;
+  if (!confirm('¿Eliminar este producto?')) return;
+  state.products = state.products.filter(p => p.id !== id);
+  saveState(); closeModal('product-modal'); renderAll();
+  showToast('🗑', 'Producto eliminado');
+}
+
+// ============================================
+// MODALS
+// ============================================
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
+// ============================================
+// EXPORT / IMPORT
+// ============================================
+function showExport() { openModal('export-modal'); }
+
+function exportData() {
+  const data = { version: 1, exportDate: new Date().toISOString(), ...state };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mihogar-backup-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  closeModal('export-modal');
+  showToast('✅', 'Respaldo exportado');
+}
+
+function triggerImport() {
+  openModal('import-modal');
+}
+function triggerImportFile() {
+  document.getElementById('import-file').click();
+}
+
+function handleImportFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.incomes || !data.products) { showToast('❌', 'Archivo inválido'); return; }
+      importPreviewData = data;
+      const preview = document.getElementById('import-preview');
+      preview.style.display = 'block';
+      document.getElementById('import-preview-content').innerHTML = `
+        <div class="predict-row"><span class="predict-label">Ingresos</span><span class="predict-value">${data.incomes.length}</span></div>
+        <div class="predict-row"><span class="predict-label">Productos</span><span class="predict-value">${data.products.length}</span></div>
+        ${data.exportDate ? `<div class="predict-row"><span class="predict-label">Exportado</span><span class="predict-value" style="font-size:11px">${new Date(data.exportDate).toLocaleDateString('es-GT')}</span></div>` : ''}`;
+      document.getElementById('import-confirm-btn').style.display = 'flex';
+    } catch(err) { showToast('❌', 'Error al leer el archivo'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function confirmImport() {
+  if (!importPreviewData) return;
+  const mode = document.getElementById('import-mode').value;
+  if (mode === 'overwrite') {
+    state.incomes = importPreviewData.incomes || [];
+    state.products = importPreviewData.products || [];
+    state.budgets = importPreviewData.budgets || [];
+    state.inventoryCategories = importPreviewData.inventoryCategories || [];
+    if (importPreviewData.balance !== undefined) state.balance = importPreviewData.balance;
+    if (importPreviewData.transactions) state.transactions = importPreviewData.transactions;
+  } else {
+    const existingIncIds = new Set(state.incomes.map(i => i.id));
+    const existingProdIds = new Set(state.products.map(p => p.id));
+    const existingBudIds = new Set((state.budgets || []).map(b => b.id));
+    const existingInvCatIds = new Set((state.inventoryCategories || []).map(c => c.id));
+    (importPreviewData.incomes || []).forEach(i => { if (!existingIncIds.has(i.id)) state.incomes.push(i); });
+    (importPreviewData.products || []).forEach(p => { if (!existingProdIds.has(p.id)) state.products.push(p); });
+    (importPreviewData.budgets || []).forEach(b => { if (!existingBudIds.has(b.id)) state.budgets.push(b); });
+    (importPreviewData.inventoryCategories || []).forEach(c => { if (!existingInvCatIds.has(c.id)) state.inventoryCategories.push(c); });
+  }
+  saveState();
+  closeModal('import-modal');
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-confirm-btn').style.display = 'none';
+  importPreviewData = null;
+  renderAll();
+  showToast('✅', 'Datos importados correctamente');
+}
+
+// ============================================
+// TOAST
+// ============================================
+let toastTimer;
+function showToast(icon, text) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-text').textContent = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================
+// INIT
+// ============================================
+loadState();
+renderDashboard();
+</script>
+</body>
+</html>
