@@ -418,9 +418,416 @@ select.form-control option {
   background: var(--celeste-soft); color: var(--celeste); font-weight: 600;
 }
 
+/* ============================================
+   ONBOARDING SYSTEM
+   ============================================ */
+
+/* WELCOME SPLASH */
+#onboarding-splash {
+  position: fixed; inset: 0; z-index: 2000;
+  background: var(--bg-deep);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 32px 28px;
+  animation: splashIn 0.5s ease;
+}
+@keyframes splashIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+#onboarding-splash.hiding {
+  animation: splashOut 0.45s ease forwards;
+}
+@keyframes splashOut {
+  to { opacity: 0; transform: scale(1.03); }
+}
+.splash-glow {
+  position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,58,237,0.35) 0%, transparent 70%);
+  pointer-events: none;
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+  0%,100% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+  50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+}
+.splash-icon {
+  font-size: 72px; margin-bottom: 20px; position: relative; z-index: 1;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+@keyframes iconFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.splash-title {
+  font-size: 32px; font-weight: 800; text-align: center;
+  background: linear-gradient(135deg, var(--lila) 0%, var(--celeste) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -1px; margin-bottom: 12px; position: relative; z-index: 1;
+}
+.splash-subtitle {
+  font-size: 15px; color: var(--text-secondary); text-align: center;
+  line-height: 1.6; max-width: 320px; margin-bottom: 40px;
+  position: relative; z-index: 1;
+}
+.splash-features {
+  width: 100%; max-width: 340px; margin-bottom: 36px;
+  display: flex; flex-direction: column; gap: 14px;
+  position: relative; z-index: 1;
+}
+.splash-feat {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px;
+  animation: featSlide 0.5s ease backwards;
+}
+.splash-feat:nth-child(1) { animation-delay: 0.15s; }
+.splash-feat:nth-child(2) { animation-delay: 0.28s; }
+.splash-feat:nth-child(3) { animation-delay: 0.41s; }
+.splash-feat:nth-child(4) { animation-delay: 0.54s; }
+@keyframes featSlide {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.splash-feat-icon {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.splash-feat-icon.lila { background: var(--lila-soft); }
+.splash-feat-icon.celeste { background: var(--celeste-soft); }
+.splash-feat-icon.success { background: rgba(74,222,128,0.12); }
+.splash-feat-icon.warning { background: rgba(251,191,36,0.12); }
+.splash-feat-text { flex: 1; }
+.splash-feat-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.splash-feat-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+.splash-start-btn {
+  width: 100%; max-width: 340px;
+  background: linear-gradient(135deg, var(--lila-dark), var(--lila-mid));
+  border: none; border-radius: 16px; padding: 16px;
+  color: white; font-family: var(--font); font-size: 16px; font-weight: 700;
+  cursor: pointer; position: relative; z-index: 1;
+  box-shadow: 0 6px 28px rgba(124,58,237,0.45);
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.splash-start-btn:active { transform: scale(0.97); box-shadow: 0 3px 14px rgba(124,58,237,0.35); }
+.splash-skip {
+  margin-top: 14px; background: none; border: none;
+  color: var(--text-muted); font-family: var(--font); font-size: 13px;
+  cursor: pointer; padding: 8px; position: relative; z-index: 1;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* TOUR OVERLAY */
+#tour-overlay {
+  position: fixed; inset: 0; z-index: 1800;
+  pointer-events: none;
+  display: none;
+}
+#tour-overlay.active { display: block; }
+
+/* Dark backdrop with spotlight hole */
+#tour-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(8,8,16,0.82);
+  pointer-events: all;
+}
+#tour-spotlight {
+  position: absolute;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 4000px rgba(8,8,16,0.82),
+    0 0 0 3px var(--lila),
+    0 0 24px rgba(167,139,250,0.6);
+  transition: all 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Tour tooltip card */
+#tour-tooltip {
+  position: absolute;
+  background: var(--bg-card2);
+  border: 1px solid rgba(167,139,250,0.4);
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 310px; width: calc(100% - 40px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(167,139,250,0.1);
+  z-index: 10; pointer-events: all;
+  transition: top 0.4s cubic-bezier(0.34,1.2,0.64,1), left 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  animation: tooltipPop 0.35s cubic-bezier(0.34,1.4,0.64,1);
+  /* Safety valve for very small screens */
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@keyframes tooltipPop {
+  from { opacity: 0; transform: scale(0.88) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+#tour-tooltip::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lila), transparent);
+}
+.tour-step-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--lila-soft); color: var(--lila);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 99px;
+  margin-bottom: 10px;
+}
+.tour-step-dots {
+  display: flex; gap: 5px; margin-left: auto;
+}
+.tour-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border); transition: all 0.25s;
+}
+.tour-dot.active { background: var(--lila); width: 18px; border-radius: 3px; }
+.tour-dot.done { background: rgba(167,139,250,0.4); }
+.tour-badge-row { display: flex; align-items: center; }
+.tour-title {
+  font-size: 17px; font-weight: 800; margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+.tour-desc {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+  margin-bottom: 16px;
+}
+.tour-tip {
+  background: rgba(103,232,249,0.08); border: 1px solid rgba(103,232,249,0.15);
+  border-radius: 10px; padding: 8px 12px; margin-bottom: 14px;
+  font-size: 11px; color: var(--celeste); line-height: 1.5;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.tour-tip-icon { flex-shrink: 0; font-size: 13px; }
+.tour-nav {
+  display: flex; gap: 8px; align-items: center;
+}
+.tour-btn-skip {
+  background: none; border: none; color: var(--text-muted);
+  font-family: var(--font); font-size: 12px; cursor: pointer; padding: 4px;
+  flex-shrink: 0;
+}
+.tour-btn-prev {
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text-secondary); border-radius: 10px;
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  padding: 10px 14px; cursor: pointer; transition: all 0.2s;
+  flex-shrink: 0;
+}
+.tour-btn-next {
+  flex: 1; background: linear-gradient(135deg, var(--lila-dark), var(--lila-mid));
+  border: none; border-radius: 10px; color: white;
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  padding: 11px 16px; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.tour-btn-next:active, .tour-btn-prev:active { transform: scale(0.96); }
+
+/* TOOLTIP ARROW */
+#tour-tooltip.arrow-top::after {
+  content: ''; position: absolute; top: -8px; left: 24px;
+  width: 0; height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--bg-card2);
+}
+#tour-tooltip.arrow-bottom::after {
+  content: ''; position: absolute; bottom: -8px; left: 24px;
+  width: 0; height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--bg-card2);
+}
+
+/* CONTEXTUAL TOOLTIP BADGES */
+.ctx-tooltip-wrap {
+  position: relative; display: inline-block;
+}
+.ctx-tooltip-trigger {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--lila-soft); color: var(--lila);
+  font-size: 10px; font-weight: 800; cursor: pointer;
+  border: 1px solid rgba(167,139,250,0.35);
+  line-height: 1; vertical-align: middle;
+  margin-left: 5px; flex-shrink: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+.ctx-tooltip-trigger:hover { background: var(--lila); color: white; transform: scale(1.15); }
+
+/* TOUR COMPLETE */
+#tour-complete {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(8,8,16,0.9); backdrop-filter: blur(16px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px; display: none;
+}
+#tour-complete.active { display: flex; animation: splashIn 0.4s ease; }
+.complete-icon { font-size: 80px; margin-bottom: 20px; animation: iconFloat 3s ease-in-out infinite; }
+.complete-title {
+  font-size: 28px; font-weight: 800; text-align: center;
+  background: linear-gradient(135deg, var(--lila) 0%, var(--celeste) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -0.8px; margin-bottom: 10px;
+}
+.complete-desc {
+  font-size: 14px; color: var(--text-secondary); text-align: center;
+  line-height: 1.7; max-width: 300px; margin-bottom: 32px;
+}
+.complete-checklist {
+  width: 100%; max-width: 320px; margin-bottom: 32px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.complete-item {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.18);
+  border-radius: 12px; padding: 12px 16px;
+  font-size: 13px; color: var(--text-secondary);
+  animation: featSlide 0.4s ease backwards;
+}
+.complete-item:nth-child(1) { animation-delay: 0.05s; }
+.complete-item:nth-child(2) { animation-delay: 0.12s; }
+.complete-item:nth-child(3) { animation-delay: 0.19s; }
+.complete-item:nth-child(4) { animation-delay: 0.26s; }
+.complete-check { font-size: 16px; }
+.complete-btn {
+  width: 100%; max-width: 320px;
+  background: linear-gradient(135deg, var(--lila-dark), var(--lila-mid));
+  border: none; border-radius: 16px; padding: 16px;
+  color: white; font-family: var(--font); font-size: 16px; font-weight: 700;
+  cursor: pointer; box-shadow: 0 6px 28px rgba(124,58,237,0.45);
+  transition: transform 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.complete-btn:active { transform: scale(0.97); }
+
+/* HELP BUTTON (persistent) */
+#help-fab {
+  position: fixed; bottom: calc(90px + var(--safe-bottom) + 68px);
+  right: 20px; z-index: 150;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--bg-card2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--lila); font-size: 16px;
+  transition: all 0.2s; box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  display: none;
+}
+#help-fab:hover { background: var(--lila-soft); transform: scale(1.1); }
+
 </style>
 </head>
 <body>
+
+<!-- ============================================
+     ONBOARDING SPLASH SCREEN
+     ============================================ -->
+<div id="onboarding-splash" style="display:none;">
+  <div class="splash-glow"></div>
+  <div class="splash-icon">🏠</div>
+  <div class="splash-title">Bienvenido a Mi Hogar</div>
+  <div class="splash-subtitle">Tu asistente para gestionar las finanzas y el inventario de tu hogar de forma inteligente.</div>
+  <div class="splash-features">
+    <div class="splash-feat">
+      <div class="splash-feat-icon lila">💰</div>
+      <div class="splash-feat-text">
+        <div class="splash-feat-name">Control de Finanzas</div>
+        <div class="splash-feat-desc">Registra ingresos, gastos y controla tu presupuesto mensual por categorías.</div>
+      </div>
+    </div>
+    <div class="splash-feat">
+      <div class="splash-feat-icon celeste">📦</div>
+      <div class="splash-feat-text">
+        <div class="splash-feat-name">Inventario del Hogar</div>
+        <div class="splash-feat-desc">Lleva el control de tus suministros con alertas automáticas de stock bajo.</div>
+      </div>
+    </div>
+    <div class="splash-feat">
+      <div class="splash-feat-icon success">🔮</div>
+      <div class="splash-feat-text">
+        <div class="splash-feat-name">Predicciones Inteligentes</div>
+        <div class="splash-feat-desc">Anticipa qué productos se agotarán antes de tu próximo ingreso.</div>
+      </div>
+    </div>
+    <div class="splash-feat">
+      <div class="splash-feat-icon warning">📊</div>
+      <div class="splash-feat-text">
+        <div class="splash-feat-name">Presupuesto por Ciclos</div>
+        <div class="splash-feat-desc">Configura tu ciclo de pago y monitorea el gasto en cada categoría.</div>
+      </div>
+    </div>
+  </div>
+  <button class="splash-start-btn" onclick="startTour()">
+    <span>Comenzar tour de 30 seg</span> <span>→</span>
+  </button>
+  <button class="splash-skip" onclick="skipOnboarding()">Saltar y explorar solo</button>
+</div>
+
+<!-- Contextual Tooltip Popup -->
+<div id="ctx-tooltip-popup" style="
+  position: fixed; z-index: 1500;
+  background: var(--bg-card2); border: 1px solid rgba(167,139,250,0.4);
+  border-radius: 14px; padding: 12px 16px; max-width: 260px;
+  font-size: 12px; color: var(--text-secondary); line-height: 1.6;
+  box-shadow: 0 6px 30px rgba(0,0,0,0.5);
+  display: none; pointer-events: none;
+  animation: tooltipPop 0.25s cubic-bezier(0.34,1.4,0.64,1);
+">
+  <div style="font-size:10px;font-weight:700;color:var(--lila);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;">💡 Consejo</div>
+  <span id="ctx-tip-content"></span>
+</div>
+
+<!-- ============================================
+     TOUR OVERLAY
+     ============================================ -->
+<div id="tour-overlay">
+  <div id="tour-backdrop" onclick="tourBackdropClick()"></div>
+  <div id="tour-spotlight"></div>
+  <div id="tour-tooltip">
+    <div class="tour-badge-row">
+      <div class="tour-step-badge">
+        <span id="tour-step-label">Paso 1</span>
+      </div>
+      <div class="tour-step-dots" id="tour-dots"></div>
+    </div>
+    <div class="tour-title" id="tour-title"></div>
+    <div class="tour-desc" id="tour-desc"></div>
+    <div class="tour-tip" id="tour-tip" style="display:none;">
+      <span class="tour-tip-icon">💡</span>
+      <span id="tour-tip-text"></span>
+    </div>
+    <div class="tour-nav">
+      <button class="tour-btn-skip" onclick="skipOnboarding()">Omitir</button>
+      <button class="tour-btn-prev" id="tour-prev-btn" onclick="tourPrev()">← Atrás</button>
+      <button class="tour-btn-next" id="tour-next-btn" onclick="tourNext()">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     TOUR COMPLETE
+     ============================================ -->
+<div id="tour-complete">
+  <div class="complete-icon">🎉</div>
+  <div class="complete-title">¡Ya estás listo!</div>
+  <div class="complete-desc">Conoces todas las funciones de Mi Hogar. Empieza agregando tu primer ingreso o producto.</div>
+  <div class="complete-checklist">
+    <div class="complete-item"><span class="complete-check">✅</span> Panel de control y saldo disponible</div>
+    <div class="complete-item"><span class="complete-check">✅</span> Registro de ingresos y gastos</div>
+    <div class="complete-item"><span class="complete-check">✅</span> Inventario con alertas de stock</div>
+    <div class="complete-item"><span class="complete-check">✅</span> Predicciones y recomendaciones</div>
+  </div>
+  <button class="complete-btn" onclick="finishTour()">
+    <span>🏠</span> <span>¡Empezar a usar Mi Hogar!</span>
+  </button>
+</div>
+
+<!-- Help FAB (persistent) -->
+<button id="help-fab" onclick="restartTour()" title="Ver el tour de nuevo">?</button>
 
 <div id="app">
   <!-- HEADER -->
@@ -454,7 +861,7 @@ select.form-control option {
     <!-- BALANCE DESTACADO -->
     <div style="padding: 0 16px 12px;">
       <div class="balance-hero" id="balance-hero">
-        <div class="balance-hero-label">💵 Disponible ahora</div>
+        <div class="balance-hero-label">💵 Disponible ahora <button class="ctx-tooltip-trigger" onclick="showCtxTip(this,'El saldo se actualiza automáticamente al registrar ingresos, gastos o ajustes manuales.')">?</button></div>
         <div class="balance-hero-amount" id="stat-balance">Q 0.00</div>
         <div class="balance-hero-sub" id="stat-balance-sub">Sin movimientos registrados</div>
         <button class="btn-add-extra" onclick="openExtraModal('income')">+ Agregar ingreso</button>
@@ -515,7 +922,7 @@ select.form-control option {
   <div id="screen-finanzas" class="screen">
     <div class="section-header">
       <div>
-        <div class="section-title">💰 Finanzas</div>
+        <div class="section-title">💰 Finanzas <button class="ctx-tooltip-trigger" onclick="showCtxTip(this,'Controla tu presupuesto mensual. Configura ingresos recurrentes, registra gastos y organiza por categorías.')">?</button></div>
         <div class="section-sub">Presupuesto del hogar</div>
       </div>
       <button class="icon-btn" onclick="openIncomeSettingsModal()" title="Configurar ingresos" style="width:38px;height:38px;">
@@ -577,7 +984,7 @@ select.form-control option {
   <div id="screen-inventario" class="screen">
     <div class="section-header">
       <div>
-        <div class="section-title">📦 Inventario</div>
+        <div class="section-title">📦 Inventario <button class="ctx-tooltip-trigger" onclick="showCtxTip(this,'Registra los productos del hogar con stock actual y consumo. La app calcula cuándo se agotarán y te alerta con anticipación.')">?</button></div>
         <div class="section-sub">Suministros del hogar</div>
       </div>
       <div style="display:flex;gap:8px;">
@@ -606,7 +1013,7 @@ select.form-control option {
   <div id="screen-prediccion" class="screen">
     <div class="section-header">
       <div>
-        <div class="section-title">🔮 Predicción</div>
+        <div class="section-title">🔮 Predicción <button class="ctx-tooltip-trigger" onclick="showCtxTip(this,'Análisis automático: muestra qué productos se agotarán antes de tu próximo ingreso y cuánto dinero necesitarás para reponerlos.')">?</button></div>
         <div class="section-sub">Análisis y recomendaciones</div>
       </div>
     </div>
@@ -2501,11 +2908,360 @@ function showToast(icon, text) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// Contextual tooltip (? badges)
+let ctxTipTimer = null;
+function showCtxTip(btn, text) {
+  const popup = document.getElementById('ctx-tooltip-popup');
+  document.getElementById('ctx-tip-content').textContent = text;
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const MARGIN = 10;
+  const ttWidth = Math.min(260, vw - MARGIN * 2);
+
+  // Pre-position off-screen to measure real height
+  popup.style.visibility = 'hidden';
+  popup.style.display = 'block';
+  popup.style.width = ttWidth + 'px';
+  popup.style.left = '-9999px';
+  popup.style.top = '0px';
+
+  // Wait one frame for layout
+  requestAnimationFrame(() => {
+    const ttHeight = popup.offsetHeight;
+    const rect = btn.getBoundingClientRect();
+
+    let left = rect.left;
+    left = Math.max(MARGIN, Math.min(left, vw - ttWidth - MARGIN));
+
+    let top = rect.bottom + 8;
+    // If it would go off the bottom, flip above the button
+    if (top + ttHeight > vh - MARGIN) {
+      top = rect.top - ttHeight - 8;
+    }
+    // Final clamp — never go above top of screen
+    top = Math.max(MARGIN, top);
+
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+    popup.style.width = ttWidth + 'px';
+    popup.style.visibility = 'visible';
+    popup.style.animation = 'none';
+    popup.offsetHeight;
+    popup.style.animation = '';
+  });
+
+  clearTimeout(ctxTipTimer);
+  ctxTipTimer = setTimeout(() => { popup.style.display = 'none'; }, 4000);
+
+  // Close on outside tap
+  const close = (e) => {
+    if (!btn.contains(e.target)) {
+      popup.style.display = 'none';
+      document.removeEventListener('click', close);
+    }
+  };
+  setTimeout(() => document.addEventListener('click', close), 10);
+}
+
+// ============================================
+// ONBOARDING SYSTEM
+// ============================================
+
+const ONBOARDING_KEY = 'mihogar_onboarding_done';
+
+// Tour steps definition
+const tourSteps = [
+  {
+    target: '#balance-hero',
+    title: '💵 Tu saldo disponible',
+    desc: 'Aquí verás tu dinero disponible en tiempo real. Se actualiza automáticamente cada vez que registras un ingreso o gasto.',
+    tip: 'Toca "+ Agregar ingreso" para registrar tu primer movimiento y ver cómo cambia el saldo.',
+    tab: 'dashboard',
+    position: 'below'
+  },
+  {
+    target: '#stats-grid',
+    title: '📊 Estadísticas rápidas',
+    desc: 'De un vistazo: tu ingreso mensual proyectado, cuándo recibirás el próximo pago, y el estado de tu inventario.',
+    tip: 'El "Próximo Ingreso" cuenta los días automáticamente según la frecuencia que configures.',
+    tab: 'dashboard',
+    position: 'below'
+  },
+  {
+    target: '.bottom-nav',
+    title: '🧭 Navegación principal',
+    desc: 'Tienes cuatro secciones: Inicio (resumen), Finanzas (ingresos y presupuesto), Inventario (productos) y Predicción (análisis).',
+    tip: 'Puedes moverte entre secciones en cualquier momento tocando los íconos.',
+    tab: 'dashboard',
+    position: 'above'
+  },
+  {
+    target: '.fin-hero',
+    title: '💰 Panel de Finanzas',
+    desc: 'Desde aquí controlas todo el dinero del hogar. Registra ingresos extras, gastos del día a día, o ajusta el saldo si es necesario.',
+    tip: 'Usa "⚖️ Ajustar" si quieres sincronizar el saldo con tu dinero real actual.',
+    tab: 'finanzas',
+    position: 'below'
+  },
+  {
+    target: '#budget-list',
+    title: '📊 Presupuesto por categorías',
+    desc: 'Crea categorías (Supermercado, Servicios, Transporte…) con un límite de gasto. La app te avisa cuando te estás acercando al límite.',
+    tip: 'Puedes configurar el día de inicio de tu ciclo de presupuesto con el botón "📅 Ciclo".',
+    tab: 'finanzas',
+    position: 'above'
+  },
+  {
+    target: '#screen-inventario .section-header',
+    title: '📦 Inventario del hogar',
+    desc: 'Agrega los productos del hogar con su cantidad actual, consumo diario y mínimo de alerta. La app calculará cuándo necesitarás reponerlos.',
+    tip: 'El botón "＋" junto a cada producto sirve para registrar una reposición rápida.',
+    tab: 'inventario',
+    position: 'below'
+  },
+  {
+    target: '#screen-inventario .stats-grid, #screen-inventario .card',
+    fallbackTarget: '#screen-inventario',
+    title: '🔴🟡🟢 Estados del inventario',
+    desc: 'Cada producto tiene un estado: Verde (stock suficiente), Amarillo (bajo, reabastecer pronto) y Rojo (crítico, se agota en menos de 7 días).',
+    tip: 'Usa los filtros "Crítico / Alerta / OK" para ver rápido qué necesitas comprar.',
+    tab: 'inventario',
+    position: 'below'
+  },
+  {
+    target: '#screen-prediccion .card',
+    title: '🔮 Predicciones',
+    desc: 'Con tus datos de ingresos y consumo, la app proyecta qué productos se agotarán antes de tu próximo pago y cuánto dinero necesitarás.',
+    tip: 'Mientras más productos con consumo registrado tengas, más precisas serán las predicciones.',
+    tab: 'prediccion',
+    position: 'below'
+  },
+  {
+    target: '.app-header .header-actions',
+    title: '💾 Exportar e Importar datos',
+    desc: 'Haz copias de seguridad de todos tus datos en un archivo JSON y recupéralos cuando lo necesites. Ideal para cambiar de dispositivo.',
+    tip: 'Exporta regularmente para no perder tu historial de ingresos y productos.',
+    tab: 'dashboard',
+    position: 'below'
+  }
+];
+
+let tourCurrentStep = 0;
+let tourActive = false;
+
+function checkOnboarding() {
+  const done = localStorage.getItem(ONBOARDING_KEY);
+  if (!done) {
+    // First time — show splash
+    document.getElementById('onboarding-splash').style.display = 'flex';
+  } else {
+    // Returning user — show help FAB
+    document.getElementById('help-fab').style.display = 'flex';
+  }
+}
+
+function startTour() {
+  // Hide splash
+  const splash = document.getElementById('onboarding-splash');
+  splash.classList.add('hiding');
+  setTimeout(() => { splash.style.display = 'none'; splash.classList.remove('hiding'); }, 450);
+
+  tourActive = true;
+  tourCurrentStep = 0;
+  document.getElementById('tour-overlay').classList.add('active');
+  buildTourDots();
+  showTourStep(0);
+}
+
+function buildTourDots() {
+  const dots = document.getElementById('tour-dots');
+  dots.innerHTML = tourSteps.map((_, i) =>
+    `<div class="tour-dot" id="tdot-${i}"></div>`
+  ).join('');
+}
+
+function updateTourDots(current) {
+  tourSteps.forEach((_, i) => {
+    const el = document.getElementById('tdot-' + i);
+    if (!el) return;
+    el.className = 'tour-dot' + (i === current ? ' active' : i < current ? ' done' : '');
+  });
+}
+
+async function showTourStep(index) {
+  const step = tourSteps[index];
+  if (!step) return;
+
+  // Switch to required tab if needed
+  if (step.tab && step.tab !== currentTab) {
+    switchTab(step.tab);
+    await new Promise(r => setTimeout(r, 350));
+  }
+
+  // Find target element
+  let target = document.querySelector(step.target);
+  if (!target && step.fallbackTarget) target = document.querySelector(step.fallbackTarget);
+  if (!target) {
+    if (index < tourSteps.length - 1) showTourStep(index + 1);
+    return;
+  }
+
+  // Scroll target into view smoothly, wait for it to settle
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  await new Promise(r => setTimeout(r, 400));
+
+  // --- Update tooltip CONTENT first (off-screen measure) ---
+  const tooltip = document.getElementById('tour-tooltip');
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  // Safe margins (accounts for iPhone SE notch / home indicator area)
+  const MARGIN_H = 12;   // horizontal margin from screen edges
+  const MARGIN_V = 8;    // vertical margin from screen edges
+  const GAP = 10;        // gap between spotlight and tooltip
+
+  const ttWidth = Math.min(300, vw - MARGIN_H * 2);
+
+  // Write content before measuring
+  document.getElementById('tour-step-label').textContent = `Paso ${index + 1} de ${tourSteps.length}`;
+  document.getElementById('tour-title').textContent = step.title;
+  document.getElementById('tour-desc').textContent = step.desc;
+
+  const tipEl = document.getElementById('tour-tip');
+  const tipTxt = document.getElementById('tour-tip-text');
+  if (step.tip) {
+    tipEl.style.display = 'flex';
+    tipTxt.textContent = step.tip;
+  } else {
+    tipEl.style.display = 'none';
+  }
+
+  const prevBtn = document.getElementById('tour-prev-btn');
+  prevBtn.style.display = index === 0 ? 'none' : 'block';
+
+  const nextBtn = document.getElementById('tour-next-btn');
+  nextBtn.textContent = index === tourSteps.length - 1 ? '¡Listo! 🎉' : 'Siguiente →';
+
+  updateTourDots(index);
+  tourCurrentStep = index;
+
+  // Pre-position off-screen to measure real height
+  tooltip.style.visibility = 'hidden';
+  tooltip.style.width = ttWidth + 'px';
+  tooltip.style.left = '-9999px';
+  tooltip.style.top = '0px';
+  tooltip.className = ''; // clear arrow class temporarily
+
+  // Force layout to get real height
+  await new Promise(r => requestAnimationFrame(r));
+  const ttHeight = tooltip.offsetHeight;
+
+  // --- Position spotlight ---
+  const rect = target.getBoundingClientRect();
+  const pad = 6;
+  const spotlight = document.getElementById('tour-spotlight');
+  spotlight.style.left   = Math.max(0, rect.left - pad) + 'px';
+  spotlight.style.top    = Math.max(0, rect.top - pad) + 'px';
+  spotlight.style.width  = (rect.width  + pad * 2) + 'px';
+  spotlight.style.height = (rect.height + pad * 2) + 'px';
+
+  // --- Decide vertical placement ---
+  const spaceBelow = vh - (rect.bottom + pad) - MARGIN_V;
+  const spaceAbove = (rect.top - pad) - MARGIN_V;
+
+  let top, arrowClass;
+
+  if (spaceBelow >= ttHeight + GAP) {
+    // Fits below
+    top = rect.bottom + pad + GAP;
+    arrowClass = 'arrow-top';
+  } else if (spaceAbove >= ttHeight + GAP) {
+    // Fits above
+    top = rect.top - pad - GAP - ttHeight;
+    arrowClass = 'arrow-bottom';
+  } else {
+    // Neither fits cleanly — center it vertically on screen and clear arrow
+    top = Math.max(MARGIN_V, (vh - ttHeight) / 2);
+    arrowClass = '';
+  }
+
+  // Clamp top so tooltip never goes off-screen vertically
+  top = Math.max(MARGIN_V, Math.min(top, vh - ttHeight - MARGIN_V));
+
+  // --- Horizontal position ---
+  // Try to left-align with target, but clamp to screen
+  let left = rect.left;
+  left = Math.max(MARGIN_H, Math.min(left, vw - ttWidth - MARGIN_H));
+
+  // Apply final position
+  tooltip.className = arrowClass;
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+  tooltip.style.width = ttWidth + 'px';
+  tooltip.style.visibility = 'visible';
+
+  // Re-trigger entrance animation
+  tooltip.style.animation = 'none';
+  tooltip.offsetHeight;
+  tooltip.style.animation = '';
+}
+
+function tourNext() {
+  if (tourCurrentStep >= tourSteps.length - 1) {
+    endTour();
+  } else {
+    showTourStep(tourCurrentStep + 1);
+  }
+}
+
+function tourPrev() {
+  if (tourCurrentStep > 0) {
+    showTourStep(tourCurrentStep - 1);
+  }
+}
+
+function tourBackdropClick() {
+  // Advance tour on backdrop click (UX convenience)
+  tourNext();
+}
+
+function endTour() {
+  document.getElementById('tour-overlay').classList.remove('active');
+  tourActive = false;
+  // Show completion screen
+  document.getElementById('tour-complete').classList.add('active');
+}
+
+function finishTour() {
+  document.getElementById('tour-complete').classList.remove('active');
+  localStorage.setItem(ONBOARDING_KEY, '1');
+  document.getElementById('help-fab').style.display = 'flex';
+  // Go back to dashboard
+  switchTab('dashboard');
+  showToast('🏠', '¡Bienvenido a Mi Hogar!');
+}
+
+function skipOnboarding() {
+  document.getElementById('onboarding-splash').style.display = 'none';
+  document.getElementById('tour-overlay').classList.remove('active');
+  document.getElementById('tour-complete').classList.remove('active');
+  tourActive = false;
+  localStorage.setItem(ONBOARDING_KEY, '1');
+  document.getElementById('help-fab').style.display = 'flex';
+}
+
+function restartTour() {
+  switchTab('dashboard');
+  setTimeout(() => startTour(), 50);
+}
+
 // ============================================
 // INIT
 // ============================================
 loadState();
 renderDashboard();
+checkOnboarding();
 </script>
 </body>
 </html>
